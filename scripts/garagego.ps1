@@ -150,9 +150,30 @@ function Publish-Site([string]$ApiUrl) {
     $env:EXPO_PUBLIC_API_URL = $api
     & npx expo export --platform web --output-dir dist
     if ($LASTEXITCODE -ne 0) { throw "The website build failed." }
+    # Cloudflare Pages never uploads folders named node_modules, and Expo puts every font, icon
+    # and image under dist/assets/node_modules. Rename it and point the code at the new folder.
+    $assets = Join-Path $Root "dist\assets"
+    if (Test-Path (Join-Path $assets "node_modules")) {
+      Rename-Item (Join-Path $assets "node_modules") "vendor"
+      Get-ChildItem (Join-Path $Root "dist") -Recurse -File -Include *.js, *.html, *.css, *.json | ForEach-Object {
+        $text = [System.IO.File]::ReadAllText($_.FullName)
+        if ($text.Contains("assets/node_modules/")) {
+          [System.IO.File]::WriteAllText($_.FullName, $text.Replace("assets/node_modules/", "assets/vendor/"), (New-Object System.Text.UTF8Encoding($false)))
+        }
+      }
+    }
     Write-Host "Publishing to Cloudflare Pages ($PagesProject.pages.dev) ..."
-    & npx --yes wrangler@4 pages deploy dist --project-name $PagesProject --branch main --commit-dirty=true
-    if ($LASTEXITCODE -ne 0) { throw "Publishing failed. If wrangler asked you to log in, run 'npx wrangler@4 login' once and try again." }
+    # Run wrangler outside the project: in a project folder it may rewrite package.json and add its
+    # own config while "helping". The Pages project must exist; on a new Cloudflare account create it
+    # once with: npx wrangler@4 pages project create garagego --production-branch main --force
+    $dist = Join-Path $Root "dist"
+    Push-Location $env:TEMP
+    try {
+      & npx --yes wrangler@4 pages deploy $dist --project-name $PagesProject --branch main --commit-dirty=true
+      if ($LASTEXITCODE -ne 0) { throw "Publishing failed. If wrangler asked you to log in, run 'npx wrangler@4 login' once and try again." }
+    } finally {
+      Pop-Location
+    }
     Write-Host ""
     Write-Host "  Live at: https://$PagesProject.pages.dev" -ForegroundColor Green
   } finally {
