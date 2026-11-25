@@ -1,0 +1,27 @@
+# Render Blueprint for the GarageGo backend (server/server.js).
+# Render dashboard → New → Blueprint → pick this repository. It asks for the secrets marked
+# sync: false; paste them from server/.env (never commit them).
+services:
+  - type: web
+    name: garagego-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci --omit=dev
+    startCommand: node server/server.js
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: AI_PROVIDER
+        value: gemini
+      - key: GEMINI_MODEL
+        value: gemini-3.7-flash
+      - key: PAYMENT_PROVIDER
+        value: mock

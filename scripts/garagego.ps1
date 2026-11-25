@@ -5,6 +5,8 @@
 #   garagego stop    close every window garagego opened
 #   garagego stop --force   also close whatever else holds ports 3000 or 8081
 #   garagego urls    show the current tunnel addresses again
+#   garagego deploy [backend-url]   build the website and publish it to Cloudflare Pages
+#                                   (garagego.pages.dev), pointed at the cloud backend
 #
 # Each part runs in its own window titled "GarageGo ...", so you can read its logs.
 # The server tunnel's address changes on every start; this script writes it into .env
@@ -18,6 +20,9 @@ $EnvFile = Join-Path $Root ".env"
 $LogDir = Join-Path $env:TEMP "garagego"
 $ServerLog = Join-Path $LogDir "tunnel-server.log"
 $WebLog = Join-Path $LogDir "tunnel-web.log"
+# The cloud backend (Render) the published website talks to; `garagego deploy <url>` updates it
+$ProductionApiFile = Join-Path $PSScriptRoot "production-api-url.txt"
+$PagesProject = "garagego"
 
 function Open-Window([string]$Title, [string]$CommandLine) {
   Start-Process cmd.exe -ArgumentList "/k", "title GarageGo $Title && cd /d `"$Root`" && $CommandLine" | Out-Null
@@ -129,15 +134,44 @@ function Start-All([bool]$Tunnels) {
   Write-Host "The website takes about a minute to build the first time. Stop everything with: garagego stop"
 }
 
+# Builds the web app with the cloud backend's address baked in, then uploads it to Cloudflare
+# Pages. The first run asks you to log in to Cloudflare in the browser (wrangler login).
+function Publish-Site([string]$ApiUrl) {
+  if ($ApiUrl) { Set-Content -Path $ProductionApiFile -Value $ApiUrl.TrimEnd("/") -Encoding ascii }
+  if (-not (Test-Path $ProductionApiFile)) {
+    Write-Host "No backend address yet. Run: garagego deploy https://<your-render-service>.onrender.com" -ForegroundColor Red
+    exit 1
+  }
+  $api = (Get-Content $ProductionApiFile -Raw).Trim()
+  Write-Host "Building the website for backend $api ..."
+  Push-Location $Root
+  try {
+    # The process environment wins over .env, so .env's local tunnel address is not used here
+    $env:EXPO_PUBLIC_API_URL = $api
+    & npx expo export --platform web --output-dir dist
+    if ($LASTEXITCODE -ne 0) { throw "The website build failed." }
+    Write-Host "Publishing to Cloudflare Pages ($PagesProject.pages.dev) ..."
+    & npx --yes wrangler@4 pages deploy dist --project-name $PagesProject --branch main --commit-dirty=true
+    if ($LASTEXITCODE -ne 0) { throw "Publishing failed. If wrangler asked you to log in, run 'npx wrangler@4 login' once and try again." }
+    Write-Host ""
+    Write-Host "  Live at: https://$PagesProject.pages.dev" -ForegroundColor Green
+  } finally {
+    Remove-Item Env:EXPO_PUBLIC_API_URL -ErrorAction SilentlyContinue
+    Pop-Location
+  }
+}
+
 switch ($Command.ToLower()) {
   "start" { Start-All $true }
   "local" { Start-All $false }
   "stop" { Stop-All ($Option -in @("--force", "-force", "force", "-f")) }
   "urls" { Show-Urls }
+  "deploy" { Publish-Site $Option }
   default {
     Write-Host "garagego start   server + website + tunnels (phone anywhere, ESP32, Wokwi)"
     Write-Host "garagego local   server + website only (phone on the same Wi-Fi)"
     Write-Host "garagego stop    close everything garagego started (add --force to free ports 3000/8081 from anything else)"
     Write-Host "garagego urls    show the current addresses"
+    Write-Host "garagego deploy  publish the website to garagego.pages.dev (first time: garagego deploy <backend-url>)"
   }
 }

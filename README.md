@@ -3,7 +3,7 @@
 Rent a neighbour's garage by the hour, anywhere in Bulgaria. Say what you need in plain words
 ("покрит гараж в Лозенец утре от 9 до 13 за джип"), book it, pay, and open the door from your phone.
 
-Built for JA Hack 2026. Live web version: **https://bodom.junioraccelerator.org**
+Built for JA Hack 2026. Live web version: **https://garagego.pages.dev**
 
 ## What it does
 
@@ -170,10 +170,16 @@ npx expo start -c     # the app: press w for web, or scan the QR code with Expo 
 
 ## Deploy
 
-The live site runs on **kuso**, the JA Hack hosting.
-- **Source:** it builds from the `main` branch of `ja-hack-2026/bodom`; every push there redeploys.
-- **One container:** the `Dockerfile` builds the web version of the app (`expo export`), and the Express server serves both it and the API from the same address.
-- **Settings:** the server's keys and the two `EXPO_PUBLIC_SUPABASE_*` values are set on the kuso service. The full deploy guide is in that repo's `AGENTS.md`.
+- **Website:** Cloudflare Pages, `https://garagego.pages.dev`. Publish with `scripts/garagego.ps1 deploy`
+  (the first time: `deploy https://<backend>.onrender.com`). It builds the web app with that backend's
+  address baked in and uploads it with wrangler; the first run asks you to log in to Cloudflare.
+- **Backend:** Render, free tier, from `render.yaml` (Render → New → Blueprint → this repository).
+  Paste `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` and `GEMINI_API_KEY` from `server/.env` when Render asks.
+  Render redeploys on every push to the branch it watches. The free tier sleeps after ~15 minutes
+  without requests, so the first request after a pause takes about a minute.
+- **ESP32:** set `SERVER_URL` in the sketch to the Render address once; it doesn't change.
+- **One container instead:** the `Dockerfile` builds an image that serves the website and the API from
+  one address (it was used on the JA Hack hosting).
 
 ## Checks
 
