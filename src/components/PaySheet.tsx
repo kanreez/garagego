@@ -251,7 +251,7 @@ export function PaySheet({ checkout, title, range, breakdown, onPaid, onClose, o
 }
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.6)" },
+  backdrop: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(35, 39, 43, 0.45)" },
   backdropWide: { justifyContent: "center", alignItems: "center", padding: spacing.lg },
   sheet: {
     maxHeight: "92%",

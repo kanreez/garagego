@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Avatar } from "../../components/Avatar";
 import { IconTile, SectionTitle } from "../../components/Bits";
@@ -26,12 +26,10 @@ export default function Profile() {
     [user?.id]
   );
 
-  const [fullName, setFullName] = useState("");
+  // The saved name until the user edits it; null = not edited
+  const [draftName, setFullName] = useState<string | null>(null);
+  const fullName = draftName ?? profile?.full_name ?? user?.user_metadata?.full_name ?? "";
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    setFullName(profile?.full_name ?? user?.user_metadata?.full_name ?? "");
-  }, [profile, user]);
 
   // Saves to the profiles table and to the login's metadata
   const persist = async (updates: ProfileUpdate) => {

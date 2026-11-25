@@ -1,6 +1,11 @@
-# Hackathon boilerplate
+# GarageGo
 
-Expo (Router) + Supabase auth + a small Node/Express backend for AI calls.
+Rent out a private garage by the hour or the day, and open it from your phone. Renters search in
+plain language ("garage near Pirogov tomorrow 9 to 13, fits a Golf"), book and pay, then tap Open
+in the app during the booking; an ESP32 at the door opens it. Hosts list garages and pair a door.
+
+Expo (Router) app + Node/Express backend + Supabase. See PRODUCT.md for the product and DESIGN.md
+for the visual system.
 
 ## Setup
 
@@ -12,11 +17,20 @@ Expo (Router) + Supabase auth + a small Node/Express backend for AI calls.
 
 2. App env: copy `.env.example` to `.env` in the project root and fill in the Supabase URL and publishable key.
 
-3. Backend env (only needed for AI / `/api/*`): copy `server/.env.example` to `server/.env` and fill in the Supabase URL, the secret key and a Gemini key. Get the secret key privately, never through git.
+3. Backend env: copy `server/.env.example` to `server/.env` and fill in the Supabase URL, the secret key and an AI key. Get the secret key privately, never through git.
+
+4. Database: run the SQL in `supabase/` in the Supabase SQL editor, `garages.sql` first.
 
 ## Run
 
-Two terminals, both in the project root:
+One command starts the backend, the app (web) and two public tunnels, and prints the addresses
+for your phone and for the ESP32:
+
+```bash
+garagego start      # garagego local: no tunnels, phone on the same Wi-Fi; garagego stop: close all
+```
+
+`garagego` is `scripts/garagego.ps1`. By hand it is two terminals in the project root:
 
 ```bash
 npm run server          # backend on port 3000
@@ -26,40 +40,35 @@ npx expo start -c       # app (press w for web, or scan the QR code with Expo Go
 - The app finds the backend on your PC automatically in development, also from a real phone on the same Wi-Fi. If Windows asks whether Node may use the network, allow it on private networks.
 - After editing `.env`, always restart with `npx expo start -c`.
 - Install packages with `npx expo install <package>`, not `npm install <package>`, so versions match the Expo SDK.
+- No door hardware at hand: `node server/fake-device.js <device key>` answers door commands like the ESP32.
 
-## Hackathon day checklist
-
-1. **Rename the app**: `src/constants/app.ts` (name, tagline) and `name`/`slug` in `app.json`.
-2. **Re-skin**: colors, font and radii all live in `src/constants/theme.ts`. Swap the marigold `accent` for the theme's color and you're most of the way there.
-3. **Model the data**: rename the `Item` type and `CATEGORIES` in `src/constants/mockData.ts`, then build screens against mock data (`USE_MOCK = true` in `src/services/items.ts`).
-4. **Switch to Supabase**: adapt and run `supabase/items.sql`, then set `USE_MOCK = false`.
-5. **Give the AI a job**: edit `SYSTEM_PROMPT` and `SUGGESTIONS` in `src/app/(tabs)/ai.tsx`; use `askAIJson()` when a screen needs data back, not text.
-
-## What's included
+## Screens
 
 | Screen | File | What it does |
 | --- | --- | --- |
-| Log in / Register | `src/app/(auth)/` | Email + password with inline errors |
-| Home | `src/app/(tabs)/index.tsx` | Greeting, ask-the-assistant box, quick actions, recent and top rated items |
-| Explore | `src/app/(tabs)/explore.tsx` | Search, category chips, "Nearby" sort by distance, pull to refresh, empty states |
-| Item detail | `src/app/item/[id].tsx` | Photo, details, open in maps, AI tips, edit, delete |
-| Item form | `src/app/item/edit.tsx` | Create (`/item/edit`) and edit (`/item/edit?id=…`), photo, location, validation |
-| Assistant | `src/app/(tabs)/ai.tsx` | Chat with Gemini, plain answers or structured JSON |
-| Profile | `src/app/(tabs)/profile.tsx` | Avatar upload, name/username, log out |
+| Log in / Register | `src/app/(auth)/` | Email or username + password |
+| Find | `src/app/(tabs)/index.tsx` | Plain-language AI search, garage list and map |
+| Garage | `src/app/garage/[id].tsx` | Details, reviews, time picker, book and pay |
+| Bookings | `src/app/(tabs)/bookings.tsx` | The active booking's door (Open / Close), upcoming and past tickets |
+| Profile / Settings | `src/app/(tabs)/profile.tsx`, `src/app/settings.tsx` | Name, username, language |
+| Host | `src/app/host/` | List and edit garages, pair a door device, earnings |
 
-Building blocks:
+Project layout:
 
 ```
-src/components/   Button, Input, Card, Chip/ChipRow, Header/IconButton, Avatar, ItemRow,
-                  StateViews (Loading, EmptyState, ErrorState), Toast (notify), BrandMark
-src/constants/    theme.ts (design tokens), app.ts (name), mockData.ts, authStyles.ts
-src/hooks/        useAsync (loading/error/data + reload), useRefreshOnFocus
-src/services/     db.ts (CRUD for any table), items.ts (mock ↔ Supabase switch),
-                  supabase.ts, api.ts (backend calls with the user's token),
-                  userService.ts (profiles), storage.ts (image upload)
-src/utils/        ai.ts (askAI, askAIJson), location.ts, media.ts (pick/take photo)
-server/           server.js: /api/me, /api/ai (Gemini, optional system prompt + JSON mode)
-supabase/         items.sql: example table, security policies and the images bucket
+src/app/          screens (Expo Router): Find, Bookings, Profile, garage/[id], host/, settings
+src/components/   Button, Input, Card, Chip, Header, GarageRow, DoorTile, DoorPanel (the door
+                  on an active booking), PaySheet, ReviewBox, StateViews, Toast (notify), map/
+src/constants/    theme.ts (design tokens, door paints; see DESIGN.md), garages.ts, app.ts
+src/services/     api.ts (backend calls with the user's token), garages.ts, payments.ts,
+                  account.ts, userService.ts (profiles), geo.ts, supabase.ts
+src/i18n/         bg.ts (default) and en.ts strings, errors.ts
+server/           server.js (garages, search, bookings, payments, door commands),
+                  repo.js (Supabase with in-memory fallback), payments/ (mock checkout),
+                  fake-device.js (stand-in ESP32)
+firmware/         garage_bridge/: the ESP32 sketch and its Wokwi wiring (diagram.json)
+supabase/         SQL for the tables (garages.sql first, then the others)
+scripts/          garagego.ps1: `garagego start | local | stop | urls`
 ```
 
 Useful snippets:
@@ -68,14 +77,10 @@ Useful snippets:
 notify("Saved");                         // toast on web and phone (Alert.alert does nothing on web)
 notify(e.message, "error");
 
-const { data, loading, error, reload } = useAsync(() => listRows<Event>("events"), []);
-
-const tips = await askAI("3 tips for...", { system: "You are a coach." });
-const { ideas } = await askAIJson<{ ideas: { title: string }[] }>('3 ideas as {"ideas":[{"title":string}]}');
+const { data, loading, error, reload } = useAsync(() => myBookings(), []);
 ```
 
 ## Supabase checklist
 
 - `profiles` table exists (used by `userService.ts`, the Profile screen and `/api/me`).
-- Storage bucket `images` exists and is public (created by `supabase/items.sql`).
 - For the demo: turn off "Confirm email" (Authentication → Sign In / Providers → Email) and create a demo account.

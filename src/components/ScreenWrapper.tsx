@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   // Clears the floating tab bar
   scrollContent: { flexGrow: 1, paddingBottom: 120 },
   scrollContentWide: { paddingBottom: spacing.xxl },
-  padded: { paddingHorizontal: spacing.lg, paddingTop: spacing.md },
+  padded: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg },
   paddedWide: { paddingHorizontal: spacing.xxl, paddingTop: spacing.xl },
   // Screens can narrow this further with their own maxWidth in `style`
   wide: { width: "100%", maxWidth: 1160, alignSelf: "center" },

@@ -7,6 +7,7 @@ import { SectionTitle } from "../../components/Bits";
 import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
 import { ChipRow } from "../../components/Chip";
+import { DoorTile } from "../../components/DoorTile";
 import { Header } from "../../components/Header";
 import { AppMap } from "../../components/map/AppMap";
 import { PaySheet } from "../../components/PaySheet";
@@ -16,7 +17,7 @@ import { ErrorState, Loading } from "../../components/StateViews";
 import { StepTracker } from "../../components/StepTracker";
 import { notify } from "../../components/Toast";
 import { placeLabel, SIZE_META } from "../../constants/garages";
-import { colors, radius, shadow, spacing, typography } from "../../constants/theme";
+import { colors, radius, shadow, spacing, typography, doorPaint } from "../../constants/theme";
 import { useAsync } from "../../hooks/useAsync";
 import { useIsWide } from "../../hooks/useIsWide";
 import { useT } from "../../i18n";
@@ -170,13 +171,11 @@ function BookForm({ garage, busy, reviews, from, to }: { garage: Garage; busy: B
   const details = (
     <>
       <View style={styles.hero}>
-        <Text style={styles.heroTitle}>{garage.title}</Text>
-        <Text style={styles.heroBody}>{garage.address ? `${garage.address}, ${placeLabel(garage)}` : placeLabel(garage)}</Text>
-        <View style={styles.access}>
-          {app ? <View style={styles.bayLine} /> : null}
-          <Text style={[styles.accessText, app && { color: colors.cta }]}>
-            {app ? t("book.accessApp") : t("book.accessManual")}
-          </Text>
+        <DoorTile garageId={garage.id} size={garage.size} width={76} height={88} />
+        <View style={styles.heroText}>
+          <Text style={styles.heroTitle}>{garage.title}</Text>
+          <Text style={styles.heroBody}>{garage.address ? `${garage.address}, ${placeLabel(garage)}` : placeLabel(garage)}</Text>
+          <Text style={[styles.accessText, app && styles.accessApp]}>{app ? t("book.accessApp") : t("book.accessManual")}</Text>
         </View>
       </View>
 
@@ -194,7 +193,7 @@ function BookForm({ garage, busy, reviews, from, to }: { garage: Garage; busy: B
 
       {spot ? (
         // A still preview: where it is at a glance; Directions opens Google Maps for the route
-        <AppMap center={spot} zoom={16} picked={spot} interactive={false} style={styles.map} />
+        <AppMap center={spot} zoom={16} picked={spot} pickedPaint={doorPaint(garage.id)} interactive={false} style={styles.map} />
       ) : null}
 
       <Reviews rating={garage.rating} reviews={reviews} />
@@ -358,9 +357,7 @@ function Reviews({ rating, reviews }: { rating?: RatingSummary; reviews: Review[
           <Text style={styles.ratingFigure}>{rating.average.toFixed(1)}</Text>
           <View style={{ gap: 4 }}>
             <Stars value={rating.average} size={16} />
-            <Text style={styles.factLabel}>
-              {tn("reviews.fromRenters", rating.count)}
-            </Text>
+            <Text style={styles.meta}>{tn("reviews.fromRenters", rating.count)}</Text>
           </View>
         </View>
       ) : (
@@ -371,7 +368,7 @@ function Reviews({ rating, reviews }: { rating?: RatingSummary; reviews: Review[
           <View style={styles.reviewHead}>
             <Stars value={r.rating} size={13} />
             <Text style={styles.reviewAuthor}>{r.author_name}</Text>
-            <Text style={styles.factLabel}>{timeAgo(r.created_at)}</Text>
+            <Text style={styles.meta}>{timeAgo(r.created_at)}</Text>
           </View>
           {r.comment ? <Text style={styles.reviewText}>{r.comment}</Text> : null}
         </View>
@@ -434,13 +431,13 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.surface,
   },
-  hero: { gap: spacing.xs, marginBottom: spacing.lg },
+  // The garage's own door beside its name: the same door as in the list and in Bookings
+  hero: { flexDirection: "row", alignItems: "flex-start", gap: spacing.md, marginBottom: spacing.lg },
+  heroText: { flex: 1, gap: spacing.xs },
   heroTitle: { ...typography.h1, color: colors.ink },
   heroBody: { ...typography.body, color: colors.textMuted },
-  access: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginTop: spacing.sm },
-  // The same painted bay line as the list rows
-  bayLine: { width: 2, alignSelf: "stretch", borderRadius: 1, backgroundColor: colors.cta },
-  accessText: { ...typography.label, color: colors.textMuted, flex: 1 },
+  accessText: { ...typography.label, color: colors.textMuted, marginTop: spacing.xs },
+  accessApp: { color: colors.accentDeep },
   photo: { height: 200, borderRadius: radius.xl, backgroundColor: colors.sand, marginBottom: spacing.md },
   facts: { borderTopWidth: 1, borderTopColor: colors.border },
   fact: { flexDirection: "row", alignItems: "baseline", gap: spacing.md, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border },
@@ -448,6 +445,8 @@ const styles = StyleSheet.create({
   factLabel: { ...typography.label, color: colors.textMuted, width: 84 },
   factValue: { ...typography.h3, color: colors.ink, flex: 1 },
   factFigure: { ...typography.figureSm },
+  // Review count and dates: same voice as the fact labels, without their fixed column width
+  meta: { ...typography.caption, color: colors.textMuted },
   ratingHead: { flexDirection: "row", alignItems: "center", gap: spacing.md, marginBottom: spacing.sm },
   ratingFigure: { ...typography.figure, color: colors.ink },
   review: { gap: 6, paddingVertical: 12, borderTopWidth: 1, borderTopColor: colors.border },

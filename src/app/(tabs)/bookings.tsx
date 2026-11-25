@@ -5,12 +5,14 @@ import { IconTile, SectionTitle, Tag } from "../../components/Bits";
 import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
 import { DoorPanel, DoorVisual } from "../../components/DoorPanel";
+import { DoorTile } from "../../components/DoorTile";
 import { canReview, ReviewBox } from "../../components/ReviewBox";
 import { Header } from "../../components/Header";
 import { ScreenWrapper } from "../../components/ScreenWrapper";
 import { EmptyState, ErrorState, Loading } from "../../components/StateViews";
 import { notify } from "../../components/Toast";
-import { colors, radius, spacing, typography } from "../../constants/theme";
+import { SIZE_META } from "../../constants/garages";
+import { colors, doorPaint, radius, spacing, typography } from "../../constants/theme";
 import { useAsync } from "../../hooks/useAsync";
 import { useRefreshOnFocus } from "../../hooks/useRefreshOnFocus";
 import { t, useT } from "../../i18n";
@@ -173,11 +175,11 @@ function ActiveBooking({ booking, now, onChanged }: { booking: Booking; now: Dat
 
       {app ? (
         <>
-          <DoorPanel visual={visual} restingOpen={isOpen} caption={caption} />
+          <DoorPanel visual={visual} restingOpen={isOpen} caption={caption} paint={doorPaint(g?.id)} stencil={g ? SIZE_META[g.size].label.charAt(0).toUpperCase() : undefined} />
           <Button
             title={door.phase === "busy" ? busyLabel(door.action) : door.phase === "error" ? t("common.tryAgain") : next === "open" ? t("door.open") : t("door.close")}
             icon={next === "open" ? "lock-open" : "lock-closed"}
-            // Yellow always means "open the door"; closing is the quiet light button
+            // Ochre always means "open the door"; closing is the graphite button
             variant={next === "open" ? "accent" : "primary"}
             loading={door.phase === "busy"}
             onPress={() => send(next)}
@@ -301,6 +303,7 @@ function BookingRow({ booking, now, note, muted, onChanged, onReviewed }: RowPro
       <Perforation />
 
       <View style={[styles.stub, muted && styles.dim]}>
+        {g ? <DoorTile garageId={g.id} size={g.size} width={38} height={44} /> : null}
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={styles.rowTitle} numberOfLines={1}>
             {g?.title ?? t("bookings.garage")}

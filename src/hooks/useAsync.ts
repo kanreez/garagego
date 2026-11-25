@@ -32,8 +32,25 @@ export function useAsync<T>(fn: () => Promise<T>, deps: unknown[] = []) {
     }
   }, []);
 
+  // Loads on mount and when deps change. State is set only once the answer arrives, and an
+  // answer that arrives after the deps changed again (or after unmount) is dropped.
   useEffect(() => {
-    run();
+    let current = true;
+    fnRef.current().then(
+      (result) => {
+        if (!current) return;
+        setData(result);
+        setError(null);
+      },
+      (e: any) => {
+        if (current) setError(e?.message ?? "Something went wrong");
+      }
+    ).finally(() => {
+      if (current) setLoading(false);
+    });
+    return () => {
+      current = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 

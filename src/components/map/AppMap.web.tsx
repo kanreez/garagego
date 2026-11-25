@@ -3,7 +3,7 @@ import "leaflet/dist/leaflet.css";
 import { useEffect, useMemo } from "react";
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { StyleSheet, View } from "react-native";
-import { colors, fonts, radius } from "../../constants/theme";
+import { colors, doorPaint, fonts, radius } from "../../constants/theme";
 import { Coords } from "../../utils/location";
 import { AppMapProps, DEFAULT_ZOOM, MapPin } from "./types";
 
@@ -16,28 +16,33 @@ const ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">Op
 // The web font stack has double quotes ("Segoe UI"), which would end the style="" attribute
 const PIN_FONT = fonts.semibold.replace(/"/g, "'");
 
-// Price pill above the point; iconSize 0 + a CSS translate keeps it centred whatever its width
-const pillIcon = (label: string, selected: boolean) =>
+// Price pill above the point: graphite, led by a square of the garage's door paint so the pin
+// matches its door in the list. Selected: ringed in that paint. iconSize 0 + a CSS translate
+// keeps it centred whatever its width.
+const pillIcon = (id: string, label: string, selected: boolean) => {
+  const paint = doorPaint(id);
+  return L.divIcon({
+    className: "",
+    iconSize: [0, 0],
+    iconAnchor: [0, 0],
+    html: `<div style="transform:translate(-50%,-115%)${selected ? " scale(1.12)" : ""};display:flex;align-items:center;gap:6px;width:max-content;white-space:nowrap;padding:4px 10px 4px 5px;border-radius:6px;border:2px solid ${selected ? paint : colors.white};box-shadow:0 3px 10px rgba(35,39,43,.3);cursor:pointer;font:600 13px/16px ${PIN_FONT};background:${colors.ink};color:${colors.onInk}"><span style="width:12px;height:14px;border-radius:2px;background:${paint}"></span>${escapeHtml(label)}</div>`,
+  });
+};
+
+// The garage's own pin: a drop in its door paint with a white dot
+const pickedIcon = (paint: string) =>
   L.divIcon({
     className: "",
     iconSize: [0, 0],
     iconAnchor: [0, 0],
-    html: `<div style="transform:translate(-50%,-115%);width:max-content;white-space:nowrap;padding:5px 10px;border-radius:999px;border:2px solid ${colors.white};box-shadow:0 4px 12px rgba(0,0,0,.45);cursor:pointer;font:600 13px/16px ${PIN_FONT};background:${selected ? colors.accent : colors.background};color:${selected ? colors.onAccent : colors.ink}">${escapeHtml(label)}</div>`,
+    html: `<div style="transform:translate(-50%,-100%);width:30px;height:30px;border-radius:50% 50% 50% 0;rotate:-45deg;translate:0 -4px;background:${paint};border:3px solid ${colors.white};box-shadow:0 3px 10px rgba(35,39,43,.3);display:flex;align-items:center;justify-content:center"><div style="width:8px;height:8px;border-radius:50%;background:${colors.white}"></div></div>`,
   });
-
-// The garage's own pin: an orange drop with a dark dot
-const pickedIcon = L.divIcon({
-  className: "",
-  iconSize: [0, 0],
-  iconAnchor: [0, 0],
-  html: `<div style="transform:translate(-50%,-100%);width:30px;height:30px;border-radius:50% 50% 50% 0;rotate:-45deg;translate:0 -4px;background:${colors.accent};border:3px solid ${colors.white};box-shadow:0 4px 12px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center"><div style="width:8px;height:8px;border-radius:50%;background:${colors.onAccent}"></div></div>`,
-});
 
 function escapeHtml(s: string) {
   return s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 }
 
-export function AppMap({ center, zoom = DEFAULT_ZOOM, recenterKey, pins = [], selectedId, onSelectPin, picked, onPick, fitToPins, interactive = true, style }: AppMapProps) {
+export function AppMap({ center, zoom = DEFAULT_ZOOM, recenterKey, pins = [], selectedId, onSelectPin, picked, pickedPaint, onPick, fitToPins, interactive = true, style }: AppMapProps) {
   return (
     <View style={[styles.wrap, style]}>
       <MapContainer
@@ -61,7 +66,7 @@ export function AppMap({ center, zoom = DEFAULT_ZOOM, recenterKey, pins = [], se
         {pins.map((p) => (
           <PricePin key={p.id} pin={p} selected={p.id === selectedId} onSelect={onSelectPin} />
         ))}
-        {picked ? <PickedPin coords={picked} onPick={onPick} /> : null}
+        {picked ? <PickedPin coords={picked} paint={pickedPaint ?? colors.ink} onPick={onPick} /> : null}
       </MapContainer>
     </View>
   );
@@ -97,7 +102,7 @@ function PickOnClick({ onPick }: { onPick: (c: Coords) => void }) {
 }
 
 function PricePin({ pin, selected, onSelect }: { pin: MapPin; selected: boolean; onSelect?: (id: string) => void }) {
-  const icon = useMemo(() => pillIcon(pin.label, selected), [pin.label, selected]);
+  const icon = useMemo(() => pillIcon(pin.id, pin.label, selected), [pin.id, pin.label, selected]);
   return (
     <Marker
       position={[pin.latitude, pin.longitude]}
@@ -110,11 +115,12 @@ function PricePin({ pin, selected, onSelect }: { pin: MapPin; selected: boolean;
   );
 }
 
-function PickedPin({ coords, onPick }: { coords: Coords; onPick?: (c: Coords) => void }) {
+function PickedPin({ coords, paint, onPick }: { coords: Coords; paint: string; onPick?: (c: Coords) => void }) {
+  const icon = useMemo(() => pickedIcon(paint), [paint]);
   return (
     <Marker
       position={[coords.latitude, coords.longitude]}
-      icon={pickedIcon}
+      icon={icon}
       draggable={!!onPick}
       zIndexOffset={2000}
       eventHandlers={{

@@ -1,11 +1,12 @@
+import { Oswald_700Bold } from "@expo-google-fonts/oswald";
 import {
-  Overpass_400Regular,
-  Overpass_500Medium,
-  Overpass_600SemiBold,
-  Overpass_700Bold,
-  Overpass_800ExtraBold,
+  Rubik_400Regular,
+  Rubik_500Medium,
+  Rubik_600SemiBold,
+  Rubik_700Bold,
+  Rubik_800ExtraBold,
   useFonts,
-} from "@expo-google-fonts/overpass";
+} from "@expo-google-fonts/rubik";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -29,7 +30,7 @@ function RootNavigator() {
     const inAuthGroup = segments[0] === "(auth)";
     if (!user && !inAuthGroup) router.replace("/login");
     else if (user && inAuthGroup) router.replace("/");
-  }, [user, loading, segments]);
+  }, [user, loading, segments, router]);
 
   if (loading) {
     return (
@@ -53,11 +54,12 @@ function RootNavigator() {
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    Overpass_400Regular,
-    Overpass_500Medium,
-    Overpass_600SemiBold,
-    Overpass_700Bold,
-    Overpass_800ExtraBold,
+    Rubik_400Regular,
+    Rubik_500Medium,
+    Rubik_600SemiBold,
+    Rubik_700Bold,
+    Rubik_800ExtraBold,
+    Oswald_700Bold,
   });
 
   useEffect(() => {
@@ -71,7 +73,7 @@ export default function RootLayout() {
     <LanguageProvider>
       <AuthProvider>
         <ToastProvider>
-          <StatusBar style="light" />
+          <StatusBar style="dark" />
           <RootNavigator />
         </ToastProvider>
       </AuthProvider>

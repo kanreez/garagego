@@ -31,9 +31,11 @@ export default function HostGarages() {
   useRefreshOnFocus(refresh);
   useRefreshOnFocus(earnings.refresh);
 
-  // Refresh "device online" while the host is pairing
+  // Refresh "device online" while the host is pairing; `now` moves with it for "seen … ago"
+  const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = setInterval(() => {
+      setNow(Date.now());
       myGarages().then(setData).catch(() => {});
     }, 3000);
     return () => clearInterval(t);
@@ -43,7 +45,7 @@ export default function HostGarages() {
 
   return (
     <ScreenWrapper scroll refreshing={refreshing} onRefresh={refresh} style={styles.page}>
-      <Header eyebrow={t("host.eyebrow")} title={t("profile.garages")} subtitle={t("host.subtitle")} back backTo="/profile" />
+      <Header title={t("profile.garages")} subtitle={t("host.subtitle")} back backTo="/profile" />
       {garages.length && earnings.data ? <EarningsCard earnings={earnings.data} /> : null}
       <Button title={t("host.list")} icon="add" variant="accent" onPress={() => router.push("/host/new")} />
       <View style={{ height: spacing.lg }} />
@@ -63,7 +65,7 @@ export default function HostGarages() {
               onChanged={(next) => setData(garages.map((x) => (x.id === next.id ? { ...x, ...next } : x)))}
               onDeleted={() => setData(garages.filter((x) => x.id !== g.id))}
             />
-            {g.access === "app" ? <PairDevice garage={g} /> : null}
+            {g.access === "app" ? <PairDevice garage={g} now={now} /> : null}
           </View>
         ))
       )}
@@ -160,9 +162,9 @@ function EarningsCard({ earnings }: { earnings: Earnings }) {
 }
 
 // "Pair a device": the key to flash onto the ESP32, and whether it has checked in
-function PairDevice({ garage }: { garage: Garage }) {
+function PairDevice({ garage, now }: { garage: Garage; now: number }) {
   useT();
-  const seen = garage.device_last_seen ? Date.now() - new Date(garage.device_last_seen).getTime() : null;
+  const seen = garage.device_last_seen ? now - new Date(garage.device_last_seen).getTime() : null;
   const online = seen != null && seen < ONLINE_MS;
   return (
     <Card style={styles.pair}>

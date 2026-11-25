@@ -1,10 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ComponentProps } from "react";
 import { Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
-import { colors, radius, shadow, spacing, typography } from "../constants/theme";
-import { t } from "../i18n";
+import { colors, doorPaints, radius, shadow, spacing, typography } from "../constants/theme";
 
-// Small shared pieces of the Ignite system (DESIGN.md)
+// Small shared pieces of the design system (DESIGN.md)
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
 
@@ -16,7 +15,7 @@ type IconTileProps = {
   style?: StyleProp<ViewStyle>;
 };
 
-// Sign blue takes white icons, line yellow takes dark ones
+// Graphite takes light icons, ochre takes dark ones
 const ICON_ON: Record<string, string> = { [colors.accent]: colors.onAccent, [colors.cta]: colors.onCta };
 
 // Rounded-square tile holding an icon
@@ -35,7 +34,7 @@ export function IconTile({ icon, size = 44, bg = colors.sand, color, style }: Ic
   );
 }
 
-// 44px round sand button at the right end of a tappable row
+// 44px round outlined button at the right end of a tappable row
 export function RowAction({ icon, label, onPress }: { icon: IconName; label: string; onPress?: () => void }) {
   if (!onPress) {
     return (
@@ -56,22 +55,6 @@ export function RowAction({ icon, label, onPress }: { icon: IconName; label: str
   );
 }
 
-// 28px blue badges with white numbers
-export function NumberedSteps({ steps }: { steps: string[] }) {
-  return (
-    <View style={styles.steps}>
-      {steps.map((s, i) => (
-        <View key={i} style={styles.stepRow}>
-          <View style={styles.stepNum}>
-            <Text style={styles.stepNumText}>{i + 1}</Text>
-          </View>
-          <Text style={styles.stepText}>{s}</Text>
-        </View>
-      ))}
-    </View>
-  );
-}
-
 // Red "do this now" block. Only for urgent / emergency.
 export function UrgentBanner({ text, style }: { text: string; style?: StyleProp<ViewStyle> }) {
   return (
@@ -80,7 +63,6 @@ export function UrgentBanner({ text, style }: { text: string; style?: StyleProp<
         <Ionicons name="warning" size={22} color={colors.error} />
       </View>
       <View style={{ flex: 1, gap: 2 }}>
-        <Text style={styles.urgentEyebrow}>{t("common.doFirst")}</Text>
         <Text style={styles.urgentText}>{text}</Text>
       </View>
     </View>
@@ -127,15 +109,20 @@ export function Headline({ title, subline, style }: { title: string; subline?: s
   );
 }
 
-// The logo: a white P on sign blue, like the parking sign. 40px in headers, 64px on auth.
+// The logo: one ochre garage door with a stencilled G, the row's door everybody recognises
 export function LogoTile({ size = 40 }: { size?: number }) {
+  const ribs = Math.max(2, Math.floor((size - 12) / 6));
   return (
     <View
-      style={[styles.tile, { width: size, height: size, borderRadius: Math.round(size * 0.22), backgroundColor: colors.accent }]}
+      style={[styles.tile, styles.logo, { width: size, height: size, borderRadius: Math.max(3, Math.round(size * 0.08)) }]}
       accessibilityElementsHidden
-      importantForAccessibility="no"
+      importantForAccessibility="no-hide-descendants"
     >
-      <Text style={[styles.logoP, { fontSize: Math.round(size * 0.66), lineHeight: Math.round(size * 0.8) }]}>P</Text>
+      <View style={[styles.logoLintel, { height: Math.round(size * 0.14) }]} />
+      {Array.from({ length: ribs }, (_, i) => (
+        <View key={i} style={[styles.logoRib, { top: Math.round(size * 0.14) + 4 + i * 6 }]} />
+      ))}
+      <Text style={[styles.logoG, { fontSize: Math.round(size * 0.6), lineHeight: Math.round(size * 0.72) }]}>G</Text>
     </View>
   );
 }
@@ -147,26 +134,16 @@ export function SectionTitle({ children, muted }: { children: string; muted?: bo
 
 const styles = StyleSheet.create({
   tile: { alignItems: "center", justifyContent: "center" },
+  // Outlined, not filled: a list repeats it on every row, so it must stay quieter than the prices
   rowAction: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.sand,
+    borderWidth: 1,
+    borderColor: colors.border,
     alignItems: "center",
     justifyContent: "center",
   },
-  steps: { gap: spacing.md },
-  stepRow: { flexDirection: "row", gap: spacing.md, alignItems: "flex-start" },
-  stepNum: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.accent,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  stepNumText: { ...typography.label, fontSize: 13, color: colors.onAccent },
-  stepText: { ...typography.body, color: colors.ink, flex: 1, marginTop: 2 },
   urgent: {
     flexDirection: "row",
     alignItems: "center",
@@ -184,7 +161,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  urgentEyebrow: { ...typography.eyebrow, color: colors.white, opacity: 0.85 },
   urgentText: { ...typography.h3, color: colors.white },
   tag: {
     flexDirection: "row",
@@ -201,5 +177,8 @@ const styles = StyleSheet.create({
   headline: { gap: spacing.sm },
   display: { ...typography.display, color: colors.ink },
   subline: { ...typography.subline, color: colors.textMuted },
-  logoP: { fontFamily: typography.display.fontFamily, color: colors.white, includeFontPadding: false },
+  logo: { backgroundColor: doorPaints[1], overflow: "hidden", justifyContent: "flex-end" },
+  logoLintel: { position: "absolute", top: 0, left: 0, right: 0, backgroundColor: "rgba(0, 0, 0, 0.22)" },
+  logoRib: { position: "absolute", left: 0, right: 0, height: 1, backgroundColor: "rgba(0, 0, 0, 0.16)" },
+  logoG: { ...typography.stencil, color: colors.white, includeFontPadding: false },
 });

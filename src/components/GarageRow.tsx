@@ -1,11 +1,13 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { placeLabel, SIZE_META } from "../constants/garages";
-import { colors, spacing, typography } from "../constants/theme";
+import { colors, typography } from "../constants/theme";
 import { t, useT } from "../i18n";
 import { Garage } from "../types/garage";
 import { formatMoney } from "../utils/booking";
 import { openDirections } from "../utils/maps";
 import { RowAction } from "./Bits";
+import { DoorTile } from "./DoorTile";
 import { RatingLine } from "./Stars";
 
 type Props = {
@@ -18,8 +20,8 @@ export function formatKm(km: number) {
   return km < 1 ? t("units.m", { n: Math.round(km * 1000) }) : t("units.km", { n: km.toFixed(1) });
 }
 
-// One garage in a list: a flat row between hairlines. Garages that open from the phone get a
-// painted bay line on the left edge, so it's visible at a glance; manual garages get nothing.
+// One garage in a list: a flat row between hairlines, led by the garage's own painted door so the
+// renter knows it again on the garage page and in Bookings.
 // The tappable info area and the directions button sit side by side, not one inside the
 // other: on web each becomes a <button>, and a button can't contain another button.
 export function GarageRow({ garage: g, distanceKm, onPress }: Props) {
@@ -29,18 +31,19 @@ export function GarageRow({ garage: g, distanceKm, onPress }: Props) {
   const spec = `${SIZE_META[g.size].label}, ${(g.covered ? t("garage.covered") : t("garage.openAir")).toLowerCase()}`;
   const info = (
     <>
+      {/* Compact: one line each, so two or more doors fit in a phone's first screen */}
       <View style={styles.body}>
-        <Text style={styles.title} numberOfLines={2}>
+        <Text style={styles.title} numberOfLines={1}>
           {g.title}
         </Text>
         <Text style={styles.caption} numberOfLines={1}>
-          {where}
+          {where}, {spec.toLowerCase()}
         </Text>
-        <Text style={styles.caption} numberOfLines={1}>
-          {spec}
-        </Text>
-        <RatingLine rating={g.rating} />
-        {app ? <Text style={styles.app}>{t("garage.opensFromPhone")}</Text> : null}
+        <View style={styles.badges}>
+          <RatingLine rating={g.rating} />
+          {/* Opens from the phone: an icon here, spelled out in the row's accessibility label */}
+          {app ? <Ionicons name="phone-portrait" size={14} color={colors.accentDeep} accessibilityElementsHidden importantForAccessibility="no" /> : null}
+        </View>
       </View>
       <View style={styles.prices}>
         <Text style={styles.price}>{formatMoney(g.price_hour)}</Text>
@@ -51,7 +54,7 @@ export function GarageRow({ garage: g, distanceKm, onPress }: Props) {
   );
   return (
     <View style={styles.row}>
-      {app ? <View style={styles.bayLine} /> : null}
+      <DoorTile garageId={g.id} size={g.size} width={58} height={66} />
       {onPress ? (
         <Pressable
           accessibilityRole="button"
@@ -73,19 +76,16 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.md,
-    paddingVertical: 14,
-    paddingLeft: 14,
+    gap: 12,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  // The painted bay line: only on garages that open from the phone
-  bayLine: { position: "absolute", left: 0, top: 14, bottom: 14, width: 2, borderRadius: 1, backgroundColor: colors.cta },
-  info: { flex: 1, flexDirection: "row", gap: spacing.md, alignItems: "flex-start" },
+  info: { flex: 1, flexDirection: "row", gap: 10, alignItems: "flex-start" },
   body: { flex: 1, gap: 2 },
   title: { ...typography.h3, color: colors.ink },
   caption: { ...typography.caption, color: colors.textMuted },
-  app: { ...typography.caption, color: colors.cta, marginTop: 2 },
+  badges: { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap", marginTop: 2 },
   prices: { alignItems: "flex-end" },
   price: { ...typography.figureSm, color: colors.ink },
   tabular: typography.tabular,

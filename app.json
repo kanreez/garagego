@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "mobile-template",
-    "slug": "mobile-template",
+    "name": "GarageGo",
+    "slug": "garagego",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mobiletemplate",
+    "scheme": "garagego",
     "userInterfaceStyle": "light",
     "ios": {
       "icon": "./assets/expo.icon"
@@ -28,7 +28,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#EDEBE4",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }

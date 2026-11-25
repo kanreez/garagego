@@ -53,7 +53,7 @@ export default function GarageFormScreen() {
   if (loading || error || !data) {
     return (
       <ScreenWrapper>
-        <Header eyebrow={t("host.eyebrow")} title={t("host.edit")} back backTo="/host" />
+        <Header title={t("host.edit")} back backTo="/host" />
         {loading ? <Loading /> : <ErrorState message={error ?? t("err.garageNotFound")} onRetry={reload} />}
       </ScreenWrapper>
     );
@@ -248,7 +248,7 @@ function GarageForm({ garage }: { garage?: Garage }) {
 
   return (
     <ScreenWrapper scroll style={styles.page}>
-      <Header eyebrow={t("host.eyebrow")} title={garage ? t("host.edit") : t("host.list")} back backTo="/host" />
+      <Header title={garage ? t("host.edit") : t("host.list")} back backTo="/host" />
 
       <Card style={styles.group}>
         <Text style={styles.groupTitle}>{t("hostForm.where")}</Text>
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
   label: { ...typography.label, color: colors.ink },
   body: { ...typography.body, color: colors.ink },
   caption: { ...typography.caption, color: colors.textMuted },
-  note: { ...typography.caption, color: colors.cta },
+  note: { ...typography.caption, color: colors.accentDeep },
   error: { ...typography.caption, color: colors.errorText },
   results: { gap: spacing.xs, padding: spacing.sm, borderRadius: radius.md, backgroundColor: colors.sand },
   result: { minHeight: 44, flexDirection: "row", alignItems: "center", gap: spacing.sm, paddingHorizontal: spacing.sm },

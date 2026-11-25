@@ -295,7 +295,6 @@ export const bg: Record<keyof typeof en, string> = {
   "pay.pay": "Плати {amount}",
   "pay.withWallet": "Плати с демо портфейл",
   "pay.demoNote": "Демо плащане: не се движат истински пари. Данните на картата не се пазят.",
-  "host.eyebrow": "Домакин",
   "host.subtitle": "Отдай гаража си, докато не ти трябва.",
   "host.list": "Обяви гараж",
   "host.edit": "Редактирай гаража",

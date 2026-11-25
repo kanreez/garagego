@@ -30,7 +30,7 @@ export function Avatar({ uri, name, size = 44 }: Props) {
 }
 
 const styles = StyleSheet.create({
-  base: { backgroundColor: colors.secondary, overflow: "hidden" },
+  base: { backgroundColor: colors.sand, overflow: "hidden" },
   fallback: { alignItems: "center", justifyContent: "center", backgroundColor: colors.accent },
   initials: { fontFamily: fonts.bold, color: colors.onAccent },
 });

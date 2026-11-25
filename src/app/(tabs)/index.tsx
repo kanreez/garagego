@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Platform, Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View, ViewStyle } from "react-native";
 import { Headline, SectionTitle } from "../../components/Bits";
 import { BrandMark } from "../../components/BrandMark";
 import { Button } from "../../components/Button";
@@ -110,7 +110,7 @@ export default function Find() {
           <IconButton icon="time-outline" label={t("profile.bookings")} onPress={() => router.navigate("/bookings")} />
         </View>
       )}
-      <Headline title={t("find.headline")} subline={t("find.subline")} />
+      <Headline title={t("find.headline")} subline={wide ? t("find.subline") : undefined} />
 
       <Card style={styles.ask}>
         <Input
@@ -120,9 +120,10 @@ export default function Find() {
           multiline
           maxLength={300}
           accessibilityLabel={t("find.askLabel")}
-          style={{ minHeight: 84 }}
+          style={{ minHeight: wide ? 84 : 56 }}
         />
-        <View style={styles.examples}>
+        {/* Phone: one sideways row, so the garage doors start in the first screen */}
+        <ScrollView horizontal={!wide} showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.examples, !wide && styles.examplesRowContent]} style={wide ? undefined : styles.examplesRow}>
           {exampleQueries().map((q) => (
             <Pressable
               key={q}
@@ -136,15 +137,18 @@ export default function Find() {
               </Text>
             </Pressable>
           ))}
-        </View>
-        <Button
-          title={t("find.submit")}
-          icon="search"
-          variant="accent"
-          loading={searching}
-          disabled={!query.trim()}
-          onPress={() => search()}
-        />
+        </ScrollView>
+        {/* Phone: the button appears once there's something to search (the examples search on tap) */}
+        {wide || query.trim() || searching ? (
+          <Button
+            title={t("find.submit")}
+            icon="search"
+            variant="accent"
+            loading={searching}
+            disabled={!query.trim()}
+            onPress={() => search()}
+          />
+        ) : null}
       </Card>
 
       {hint ? (
@@ -281,11 +285,16 @@ function Understood({ result, onClear }: { result: SearchResult; onClear: () => 
   );
 }
 
+// The blue band of a Bulgarian (EU) number plate: a material of the plate, not a theme colour
+const EU_PLATE_BLUE = "#1F3FA6";
+
 const styles = StyleSheet.create({
   eyebrowMuted: { ...typography.eyebrow, color: colors.textMuted },
-  topRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: spacing.lg },
-  ask: { gap: spacing.md, padding: spacing.md, marginTop: spacing.lg, borderRadius: radius.xl },
+  topRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: spacing.md },
+  ask: { gap: 12, padding: spacing.md, marginTop: spacing.md, borderRadius: radius.xl },
   examples: { gap: 6 },
+  examplesRow: { marginHorizontal: -spacing.md, flexGrow: 0 },
+  examplesRowContent: { paddingHorizontal: spacing.md },
   example: {
     alignSelf: "flex-start",
     maxWidth: "100%",
@@ -311,10 +320,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     backgroundColor: colors.plate,
   },
-  plateBand: { width: 10, backgroundColor: colors.accent },
-  plateText: { ...typography.label, color: colors.onInk, paddingHorizontal: 10, alignSelf: "center", flexShrink: 1, ...typography.tabular },
+  plateBand: { width: 10, backgroundColor: EU_PLATE_BLUE },
+  plateText: { ...typography.label, color: colors.ink, paddingHorizontal: 10, alignSelf: "center", flexShrink: 1, ...typography.tabular },
   caption: { ...typography.caption, color: colors.textMuted },
-  resultsHead: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: spacing.md },
+  resultsHead: { flexDirection: "row", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", columnGap: spacing.md },
   viewToggle: { flexDirection: "row", gap: 6, marginBottom: spacing.sm },
   mapHint: { ...typography.caption, color: colors.textMuted, marginTop: spacing.sm },
   columns: { flexDirection: "row", alignItems: "flex-start", gap: spacing.xl },

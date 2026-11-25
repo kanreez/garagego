@@ -3,7 +3,7 @@ import { ComponentProps } from "react";
 import { ActivityIndicator, Pressable, PressableProps, StyleSheet, Text } from "react-native";
 import { colors, radius, shadow, spacing, typography } from "../constants/theme";
 
-// accent = the line-yellow step forward: one per screen
+// accent = the ochre step forward: one per screen
 type Variant = "primary" | "accent" | "secondary" | "ghost" | "danger";
 
 type Props = Omit<PressableProps, "children"> & {
@@ -33,7 +33,7 @@ export function Button({
   ...rest
 }: Props) {
   const isDisabled = disabled || loading;
-  // A disabled yellow button would turn muddy; it shows as a quiet raised one instead
+  // A disabled ochre button would turn muddy; it shows as a quiet raised one instead
   const p = variant === "accent" && disabled && !loading ? palette.secondary : palette[variant];
 
   return (
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   base: {
     minHeight: 56,
     paddingHorizontal: spacing.lg,
-    borderRadius: radius.pill,
+    borderRadius: radius.md,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

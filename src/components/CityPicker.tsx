@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.sand,
   },
   value: { ...typography.body, color: colors.ink },
-  backdrop: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0, 0, 0, 0.6)" },
+  backdrop: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(35, 39, 43, 0.45)" },
   backdropWide: { justifyContent: "center", alignItems: "center", padding: spacing.lg },
   sheet: {
     height: "80%",

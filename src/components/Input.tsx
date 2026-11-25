@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: colors.border,
     borderRadius: radius.md,
-    backgroundColor: colors.sand,
+    backgroundColor: colors.white,
     color: colors.ink,
   },
   multiline: { minHeight: 110, textAlignVertical: "top" },

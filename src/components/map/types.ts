@@ -13,6 +13,7 @@ export type AppMapProps = {
   selectedId?: string | null;
   onSelectPin?: (id: string) => void;
   picked?: Coords | null; // a single pin, e.g. the garage's location
+  pickedPaint?: string; // that pin's colour: the garage's door paint (doorPaint), so it matches its door
   onPick?: (coords: Coords) => void; // with it, tapping the map or dragging the pin moves `picked`
   fitToPins?: boolean; // frame all pins (when there are 2+) instead of using center/zoom
   interactive?: boolean; // false = a still preview that can't be panned or zoomed

@@ -293,7 +293,6 @@ export const en = {
   "pay.pay": "Pay {amount}",
   "pay.withWallet": "Pay with demo wallet",
   "pay.demoNote": "Demo checkout: no real money moves. Card details aren't stored.",
-  "host.eyebrow": "Host",
   "host.subtitle": "Rent out your garage while you don't need it.",
   "host.list": "List a garage",
   "host.edit": "Edit garage",

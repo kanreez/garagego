@@ -1,82 +1,92 @@
-// Design tokens: "Garage at night" (see DESIGN.md). Re-skin the whole app by editing this file.
-// Asphalt and concrete for the ground, sign blue for brand and selection, line yellow (the
-// painted bay line) as the one action colour. Every text/background pair passes WCAG AA.
+// Design tokens: "Garage rows" (see DESIGN.md). Re-skin the whole app by editing this file.
+// Light concrete ground and graphite ink, like the rows of painted metal garages behind the panel
+// blocks. The door paints are the only saturated colours: every garage keeps one door colour for
+// good (doorPaint below). Ochre is the one action colour. Every text/background pair passes WCAG AA.
 
 export const colors = {
-  background: "#15171A", // asphalt: app ground
-  surface: "#22262B", // concrete: rows, sheets, tab bar
-  sand: "#2D3238", // raised: inputs, quiet buttons, empty thumbs (name kept for old code)
-  border: "#3A4048", // hairlines, input borders, door frame
-  ink: "#EEF0F2", // main text (15.7:1 on asphalt); also the fill of "primary" (light) buttons
-  inkSoft: "#D5D9DE", // pressed primary
-  onInk: "#15171A", // text/icons on an ink (light) fill
-  textMuted: "#9BA3AD", // hints, captions (7.0:1 on asphalt, 5.1:1 on raised)
-  accent: "#1F5FD0", // sign blue: brand tile, selection, active tab, map pins
-  accentSoft: "#162238", // dark blue tint: selected tiles, info strips
-  accentDeep: "#7FA8FF", // sign blue as TEXT on the dark ground (7.7:1)
-  onAccent: "#FFFFFF", // text/icons on sign blue (5.8:1)
-  cta: "#F5C400", // line yellow: Open, and the one forward button per screen
-  ctaPressed: "#E0B400",
-  onCta: "#15171A", // text/icons on line yellow (10.9:1)
-  success: "#4CC38A",
-  successSoft: "#14271F",
-  error: "#C8261C", // emergency fill, white text on it (5.6:1)
-  errorSoft: "#3A1C1C",
-  errorText: "#FF8A85", // red text on the dark ground
-  white: "#FFFFFF", // logo glyph, text on the error fill
-  plate: "#F2F4F7", // number-plate white for the "What I understood" strips
-
-  // Aliases kept so older code keeps working
-  primary: "#EEF0F2",
-  primaryDark: "#D5D9DE",
-  secondary: "#2D3238",
-  text: "#EEF0F2",
+  background: "#EDEBE4", // concrete: app ground
+  surface: "#F8F7F3", // whitewash: rows, sheets, tab bar
+  sand: "#E2DFD5", // raised: inputs, quiet buttons, empty thumbs (name kept for old code)
+  border: "#CFCBC0", // hairlines, input borders, door frame
+  ink: "#23272B", // graphite: main text (13.0:1 on concrete); also the fill of "primary" buttons
+  inkSoft: "#3B4046", // pressed primary
+  onInk: "#F8F7F3", // text/icons on a graphite fill
+  textMuted: "#5B6067", // hints, captions (5.4:1 on concrete, 4.9:1 on raised)
+  // Selection and chrome are graphite, not a brand colour: saturated colour belongs to the doors
+  // and the ochre action only (names kept for old code)
+  accent: "#23272B", // active tab, selected chips, step dots, focus
+  accentSoft: "#E4E1D8", // selected tiles, info strips: a step darker than concrete
+  accentDeep: "#23272B", // links and emphasised notes
+  onAccent: "#F8F7F3", // text/icons on graphite
+  cta: "#E2A23A", // ochre door paint: Open, and the one forward button per screen
+  ctaPressed: "#C98D2C",
+  onCta: "#23272B", // text/icons on ochre (7.2:1)
+  success: "#2F7A58",
+  successSoft: "#DCEDE3",
+  error: "#A93A2E", // oxide red fill, white text on it (6.0:1)
+  errorSoft: "#F4DFDA",
+  errorText: "#9C3327", // red text on the light ground
+  white: "#FFFFFF", // logo glyph, text on paint and the error fill
+  plate: "#FFFFFF", // number-plate white for the "What I understood" strips
 } as const;
 
-// Left over from an earlier idea; kept so nothing that imports it breaks
-export const routeColors = {
-  diy: { solid: "#4CC38A", tint: "#14271F" },
-  specialist: { solid: "#F5C400", tint: "#2E2814" },
-  manager: { solid: "#7FA8FF", tint: "#162238" },
-  neighbor: { solid: "#56C7BA", tint: "#14292A" },
-} as const;
+// Door paints, deepened from the faded originals so a stencilled letter in white reads on them
+// (large text, ≥3:1). Order matters: doorPaint() picks by a stable hash of the garage id.
+export const doorPaints = [
+  "#4E8576", // mint
+  "#A8702A", // ochre
+  "#9A4236", // oxide red
+  "#4A729C", // sky
+  "#6D7342", // olive
+  "#6B587C", // plum
+] as const;
 
-// Flat by default: hierarchy comes from surface steps and spacing. Only floating things get depth.
+// One garage, one door colour, on every screen and every visit
+export function doorPaint(id: string | null | undefined) {
+  let h = 0;
+  for (const ch of id ?? "") h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return doorPaints[h % doorPaints.length];
+}
+
+// Flat by default: hierarchy comes from surface steps, hairlines and spacing. Only floating things
+// (tab bar, toasts, sheets) get depth; the ochre Open control gets a soft, offset lift.
 export const shadow = {
   card: {},
-  float: { boxShadow: "0px 12px 32px rgba(0, 0, 0, 0.5)" },
-  glow: { boxShadow: "0px 10px 28px rgba(245, 196, 0, 0.22)" }, // the Open control only
+  float: { boxShadow: "0px 10px 28px rgba(35, 39, 43, 0.16)" },
+  glow: { boxShadow: "0px 6px 16px rgba(168, 112, 42, 0.28)" }, // the Open control only
 } as const;
 
-// Loaded in src/app/_layout.tsx. Change the family there and here together.
-// Overpass is drawn from highway signage and covers Cyrillic, so Bulgarian text keeps the same face.
+// Loaded in src/app/_layout.tsx. Change the families there and here together.
+// Rubik carries every word (full Cyrillic); Oswald is only the stencil on the doors.
 export const fonts = {
-  regular: "Overpass_400Regular",
-  medium: "Overpass_500Medium",
-  semibold: "Overpass_600SemiBold",
-  bold: "Overpass_700Bold",
-  heavy: "Overpass_800ExtraBold",
+  regular: "Rubik_400Regular",
+  medium: "Rubik_500Medium",
+  semibold: "Rubik_600SemiBold",
+  bold: "Rubik_700Bold",
+  heavy: "Rubik_800ExtraBold",
+  stencil: "Oswald_700Bold",
 } as const;
 
 export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, xxl: 48 } as const;
 
-// Radius follows hierarchy: hero blocks are rounder than small controls.
-export const radius = { sm: 8, md: 12, lg: 16, xl: 24, pill: 999 } as const;
+// Sheet steel and concrete: small radii. Pills only where the platform expects them.
+export const radius = { sm: 4, md: 8, lg: 12, xl: 16, pill: 999 } as const;
 
 // Equal-width digits: prices, times and countdowns don't jitter while they change
 const tabular = { fontVariant: ["tabular-nums"] as ("tabular-nums")[] };
 
 export const typography = {
-  display: { fontFamily: fonts.heavy, fontSize: 34, lineHeight: 38, letterSpacing: -0.5 },
-  h1: { fontFamily: fonts.heavy, fontSize: 26, lineHeight: 30, letterSpacing: -0.3 },
-  h2: { fontFamily: fonts.bold, fontSize: 19, lineHeight: 24 },
-  h3: { fontFamily: fonts.semibold, fontSize: 16, lineHeight: 21 },
+  display: { fontFamily: fonts.bold, fontSize: 32, lineHeight: 36, letterSpacing: -0.6 },
+  h1: { fontFamily: fonts.bold, fontSize: 26, lineHeight: 30, letterSpacing: -0.4 },
+  h2: { fontFamily: fonts.semibold, fontSize: 19, lineHeight: 24, letterSpacing: -0.2 },
+  h3: { fontFamily: fonts.medium, fontSize: 16, lineHeight: 21 },
   body: { fontFamily: fonts.regular, fontSize: 15, lineHeight: 22 },
   subline: { fontFamily: fonts.regular, fontSize: 16, lineHeight: 23 }, // muted line under headlines
-  label: { fontFamily: fonts.semibold, fontSize: 14, lineHeight: 18 },
+  label: { fontFamily: fonts.medium, fontSize: 14, lineHeight: 18 },
   caption: { fontFamily: fonts.regular, fontSize: 13, lineHeight: 17 },
-  eyebrow: { fontFamily: fonts.semibold, fontSize: 12, lineHeight: 16 },
-  figure: { fontFamily: fonts.heavy, fontSize: 40, lineHeight: 44, letterSpacing: -0.5, ...tabular }, // big numbers
-  figureSm: { fontFamily: fonts.bold, fontSize: 22, lineHeight: 26, ...tabular },
+  eyebrow: { fontFamily: fonts.medium, fontSize: 12, lineHeight: 16 },
+  figure: { fontFamily: fonts.bold, fontSize: 40, lineHeight: 44, letterSpacing: -0.8, ...tabular }, // big numbers
+  figureSm: { fontFamily: fonts.semibold, fontSize: 22, lineHeight: 26, letterSpacing: -0.3, ...tabular },
+  stencil: { fontFamily: fonts.stencil, letterSpacing: 1 }, // size with fontSize where used
   tabular,
 } as const;

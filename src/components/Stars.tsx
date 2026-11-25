@@ -4,7 +4,7 @@ import { colors, typography } from "../constants/theme";
 import { useT } from "../i18n";
 import { RatingSummary } from "../types/garage";
 
-// Stars are ink, not yellow: line yellow stays reserved for opening the door and the forward action
+// Stars are ink, not ochre: ochre stays reserved for opening the door and the forward action
 
 type StarsProps = { value: number; size?: number; color?: string };
 

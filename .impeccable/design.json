@@ -1,0 +1,591 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-20T15:16:20+00:00",
+  "title": "Design System: GarageGo",
+  "extensions": {
+    "colorMeta": {
+      "concrete": {
+        "role": "neutral",
+        "displayName": "Concrete",
+        "canonical": "#EDEBE4",
+        "tonalRamp": [
+          "#2B2922",
+          "#494537",
+          "#6B644D",
+          "#8F8561",
+          "#A79F81",
+          "#BEB9A7",
+          "#D7D4CB",
+          "#F3F3F1"
+        ]
+      },
+      "whitewash": {
+        "role": "neutral",
+        "displayName": "Whitewash",
+        "canonical": "#F8F7F3",
+        "tonalRamp": [
+          "#2C2A20",
+          "#4B4734",
+          "#706848",
+          "#968A59",
+          "#ADA37A",
+          "#C2BCA3",
+          "#D9D6CA",
+          "#F4F3F1"
+        ]
+      },
+      "raised": {
+        "role": "neutral",
+        "displayName": "Raised",
+        "canonical": "#E2DFD5",
+        "tonalRamp": [
+          "#2A2822",
+          "#484438",
+          "#6A634E",
+          "#8D8363",
+          "#A69D82",
+          "#BDB8A8",
+          "#D6D4CC",
+          "#F3F3F1"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#CFCBC0",
+        "tonalRamp": [
+          "#292823",
+          "#46433A",
+          "#666151",
+          "#877F68",
+          "#A19A87",
+          "#BAB6AB",
+          "#D5D3CD",
+          "#F3F3F1"
+        ]
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite",
+        "canonical": "#23272B",
+        "tonalRamp": [
+          "#242629",
+          "#3B4044",
+          "#545C64",
+          "#6C7884",
+          "#8A949E",
+          "#ADB2B8",
+          "#CED1D4",
+          "#F2F2F3"
+        ]
+      },
+      "graphite-pressed": {
+        "role": "neutral",
+        "displayName": "Graphite Pressed",
+        "canonical": "#3B4046",
+        "tonalRamp": [
+          "#242628",
+          "#3C3F44",
+          "#555B62",
+          "#6E7782",
+          "#8C939C",
+          "#AEB2B7",
+          "#CFD1D4",
+          "#F2F2F3"
+        ]
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "#5B6067",
+        "tonalRamp": [
+          "#252628",
+          "#3D3F43",
+          "#575B61",
+          "#71777F",
+          "#8E939A",
+          "#AFB2B6",
+          "#CFD1D3",
+          "#F2F2F3"
+        ]
+      },
+      "selected-tint": {
+        "role": "neutral",
+        "displayName": "Selected Tint",
+        "canonical": "#E4E1D8",
+        "tonalRamp": [
+          "#2A2822",
+          "#484438",
+          "#6A634E",
+          "#8D8263",
+          "#A69D82",
+          "#BDB8A8",
+          "#D6D4CC",
+          "#F3F3F1"
+        ]
+      },
+      "ochre-action": {
+        "role": "primary",
+        "displayName": "Ochre Action",
+        "canonical": "#E2A23A",
+        "tonalRamp": [
+          "#372A16",
+          "#61481F",
+          "#956923",
+          "#CE8C22",
+          "#DCA54C",
+          "#DEBD87",
+          "#E6D6BC",
+          "#F7F3EE"
+        ]
+      },
+      "ochre-action-pressed": {
+        "role": "primary",
+        "displayName": "Ochre Action Pressed",
+        "canonical": "#C98D2C",
+        "tonalRamp": [
+          "#342A18",
+          "#5C4623",
+          "#8D672B",
+          "#C2892E",
+          "#D2A356",
+          "#D8BB8D",
+          "#E3D5BF",
+          "#F6F3EE"
+        ]
+      },
+      "success": {
+        "role": "status",
+        "displayName": "Paid Green",
+        "canonical": "#2F7A58",
+        "tonalRamp": [
+          "#1C3027",
+          "#2C5442",
+          "#3A7E5F",
+          "#45AB7D",
+          "#69BF98",
+          "#99CCB5",
+          "#C5DED2",
+          "#F0F5F2"
+        ]
+      },
+      "success-soft": {
+        "role": "status",
+        "displayName": "Paid Green Soft",
+        "canonical": "#DCEDE3",
+        "tonalRamp": [
+          "#1F2D25",
+          "#314E3D",
+          "#437457",
+          "#539D71",
+          "#75B38E",
+          "#A0C5AF",
+          "#C8DACF",
+          "#F0F4F2"
+        ]
+      },
+      "oxide-error": {
+        "role": "status",
+        "displayName": "Oxide Red",
+        "canonical": "#A93A2E",
+        "tonalRamp": [
+          "#331C1A",
+          "#592B26",
+          "#873930",
+          "#BA4336",
+          "#CB675D",
+          "#D49891",
+          "#E1C4C1",
+          "#F6F0EF"
+        ]
+      },
+      "error-soft": {
+        "role": "status",
+        "displayName": "Oxide Red Soft",
+        "canonical": "#F4DFDA",
+        "tonalRamp": [
+          "#321F1A",
+          "#583128",
+          "#854232",
+          "#B65139",
+          "#C8745F",
+          "#D29F93",
+          "#E0C8C2",
+          "#F5F0EF"
+        ]
+      },
+      "error-text": {
+        "role": "status",
+        "displayName": "Oxide Red Text",
+        "canonical": "#9C3327",
+        "tonalRamp": [
+          "#341C19",
+          "#5B2A25",
+          "#8A372E",
+          "#BD4133",
+          "#CE665A",
+          "#D59790",
+          "#E2C4C0",
+          "#F6EFEF"
+        ]
+      },
+      "plate-white": {
+        "role": "neutral",
+        "displayName": "Plate White",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#262626",
+          "#404040",
+          "#5C5C5C",
+          "#787878",
+          "#949494",
+          "#B2B2B2",
+          "#D1D1D1",
+          "#F2F2F2"
+        ]
+      },
+      "door-mint": {
+        "role": "secondary",
+        "displayName": "Door Mint",
+        "canonical": "#4E8576",
+        "tonalRamp": [
+          "#202C29",
+          "#344B45",
+          "#487065",
+          "#5A9686",
+          "#7BAD9F",
+          "#A3C2B9",
+          "#CAD8D4",
+          "#F1F4F3"
+        ]
+      },
+      "door-ochre": {
+        "role": "secondary",
+        "displayName": "Door Ochre",
+        "canonical": "#A8702A",
+        "tonalRamp": [
+          "#342819",
+          "#5B4325",
+          "#8A612E",
+          "#BD8033",
+          "#CE9A5A",
+          "#D5B690",
+          "#E2D3C0",
+          "#F6F3EF"
+        ]
+      },
+      "door-oxide": {
+        "role": "secondary",
+        "displayName": "Door Oxide Red",
+        "canonical": "#9A4236",
+        "tonalRamp": [
+          "#311E1C",
+          "#552F2A",
+          "#814037",
+          "#AF4E40",
+          "#C27165",
+          "#CE9D97",
+          "#DFC7C4",
+          "#F5F0EF"
+        ]
+      },
+      "door-sky": {
+        "role": "secondary",
+        "displayName": "Door Sky",
+        "canonical": "#4A729C",
+        "tonalRamp": [
+          "#1E262E",
+          "#303F50",
+          "#415B77",
+          "#4F77A1",
+          "#7193B6",
+          "#9EB2C7",
+          "#C7D1DB",
+          "#F0F2F4"
+        ]
+      },
+      "door-olive": {
+        "role": "secondary",
+        "displayName": "Door Olive",
+        "canonical": "#6D7342",
+        "tonalRamp": [
+          "#2B2C20",
+          "#494C34",
+          "#6B7047",
+          "#8F9759",
+          "#A8AE7A",
+          "#BEC2A3",
+          "#D7D9C9",
+          "#F3F4F1"
+        ]
+      },
+      "door-plum": {
+        "role": "secondary",
+        "displayName": "Door Plum",
+        "canonical": "#6B587C",
+        "tonalRamp": [
+          "#26222A",
+          "#403847",
+          "#5D4F69",
+          "#79648B",
+          "#9583A4",
+          "#B3A9BC",
+          "#D1CCD6",
+          "#F2F1F3"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Screen headline."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Garage page title."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Section titles, active booking garage name."
+      },
+      "title-sm": {
+        "displayName": "Title Small",
+        "purpose": "Row titles, door captions, wordmark (700)."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text and inputs."
+      },
+      "subline": {
+        "displayName": "Subline",
+        "purpose": "Muted line under headlines."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons (at 16), chips, plates, field labels."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Meta lines in rows, hints, example pills."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Prices and ticket times, tabular."
+      },
+      "figure-sm": {
+        "displayName": "Figure Small",
+        "purpose": "Row prices, time left, tabular."
+      },
+      "stencil": {
+        "displayName": "Stencil",
+        "purpose": "Only a single letter painted on a door."
+      }
+    },
+    "shadows": [
+      {
+        "name": "float",
+        "value": "0px 10px 28px rgba(35, 39, 43, 0.16)",
+        "purpose": "Floating tab bar, toasts, sheets, the urgent banner."
+      },
+      {
+        "name": "glow",
+        "value": "0px 6px 16px rgba(168, 112, 42, 0.28)",
+        "purpose": "The enabled ochre button only."
+      }
+    ],
+    "motion": [
+      {
+        "name": "door-roll",
+        "value": "700ms cubic-bezier(0.33, 1, 0.68, 1)",
+        "purpose": "Roller door opening or closing (ease-out cubic); the one motion moment."
+      },
+      {
+        "name": "door-settle",
+        "value": "260ms cubic-bezier(0.33, 1, 0.68, 1)",
+        "purpose": "Door lifts 6px and holds while a command runs."
+      },
+      {
+        "name": "door-shimmer",
+        "value": "650ms cubic-bezier(0.45, 0, 0.55, 1), alternating",
+        "purpose": "Slat shimmer while opening or closing."
+      },
+      {
+        "name": "door-shake",
+        "value": "5 steps of 55ms (10, -8, 6, -3, 0 px)",
+        "purpose": "Error: the door drops back and shakes."
+      },
+      {
+        "name": "reduced-motion-crossfade",
+        "value": "120ms out, 180ms in",
+        "purpose": "Replaces all door movement under Reduce Motion."
+      },
+      {
+        "name": "press-scale",
+        "value": "scale(0.96)",
+        "purpose": "Press feedback on buttons, chips, example pills and row actions."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "390px"
+      },
+      {
+        "name": "wide",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Accent Button",
+      "kind": "button",
+      "refersTo": "button-accent",
+      "description": "The one ochre forward action per screen (Open, Search, Book, Pay).",
+      "html": "<button class=\"ds-btn-accent\">Отвори</button>",
+      "css": ".ds-btn-accent { font-family: Rubik, system-ui, sans-serif; font-weight: 500; font-size: 16px; line-height: 18px; min-height: 56px; padding: 0 24px; border: none; border-radius: 8px; background: #E2A23A; color: #23272B; box-shadow: 0px 6px 16px rgba(168, 112, 42, 0.28); cursor: pointer; transition: transform 0.12s ease-out, background 0.12s; } .ds-btn-accent:hover { background: #C98D2C; } .ds-btn-accent:active { background: #C98D2C; transform: scale(0.96); } .ds-btn-accent:focus-visible { outline: 2px solid #23272B; outline-offset: 2px; }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Graphite button; Close on the active booking.",
+      "html": "<button class=\"ds-btn-primary\">Затвори</button>",
+      "css": ".ds-btn-primary { font-family: Rubik, system-ui, sans-serif; font-weight: 500; font-size: 16px; line-height: 18px; min-height: 56px; padding: 0 24px; border: none; border-radius: 8px; background: #23272B; color: #F8F7F3; cursor: pointer; transition: transform 0.12s ease-out, background 0.12s; } .ds-btn-primary:hover { background: #3B4046; } .ds-btn-primary:active { background: #3B4046; transform: scale(0.96); } .ds-btn-primary:focus-visible { outline: 2px solid #E2A23A; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Quiet raised action; also the disabled look of the accent button.",
+      "html": "<button class=\"ds-btn-secondary\">Отказ</button>",
+      "css": ".ds-btn-secondary { font-family: Rubik, system-ui, sans-serif; font-weight: 500; font-size: 16px; min-height: 56px; padding: 0 24px; border: none; border-radius: 8px; background: #E2DFD5; color: #23272B; cursor: pointer; transition: transform 0.12s ease-out, background 0.12s; } .ds-btn-secondary:hover, .ds-btn-secondary:active { background: #CFCBC0; } .ds-btn-secondary:active { transform: scale(0.96); } .ds-btn-secondary:focus-visible { outline: 2px solid #23272B; outline-offset: 2px; }"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "White field with a hairline border that turns graphite on focus.",
+      "html": "<label class=\"ds-field\"><span>Адрес</span><input class=\"ds-input\" placeholder=\"близо до Пирогов утре от 9 до 13, за голф\"></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font-family: Rubik, system-ui, sans-serif; } .ds-field span { font-weight: 500; font-size: 14px; line-height: 18px; color: #23272B; } .ds-input { font-family: Rubik, system-ui, sans-serif; font-size: 15px; line-height: 22px; min-height: 54px; padding: 12px 16px; border: 1.5px solid #CFCBC0; border-radius: 8px; background: #FFFFFF; color: #23272B; box-sizing: border-box; outline: none; } .ds-input::placeholder { color: #5B6067; } .ds-input:hover { border-color: #5B6067; } .ds-input:focus, .ds-input:focus-visible { border-color: #23272B; }"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Pill toggle; graphite when selected (list/map toggle).",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip ds-chip-on\">Списък</button><button class=\"ds-chip\">Карта</button></div>",
+      "css": ".ds-chips { display: flex; gap: 6px; } .ds-chip { font-family: Rubik, system-ui, sans-serif; font-weight: 500; font-size: 14px; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #CFCBC0; background: #F8F7F3; color: #23272B; cursor: pointer; transition: transform 0.12s ease-out; } .ds-chip:hover { background: #E4E1D8; } .ds-chip:active { transform: scale(0.96); } .ds-chip:focus-visible { outline: 2px solid #23272B; outline-offset: 2px; } .ds-chip-on, .ds-chip-on:hover { background: #23272B; border-color: #23272B; color: #F8F7F3; }"
+    },
+    {
+      "name": "Example Query Pills",
+      "kind": "chip",
+      "refersTo": null,
+      "description": "Raised pills under the Find input that search on tap; one horizontal scrolling row on phone.",
+      "html": "<div class=\"ds-examples\"><button class=\"ds-example\">близо до Пирогов утре от 9 до 13, за голф</button><button class=\"ds-example\">покрит гараж в Лозенец този уикенд за джип</button><button class=\"ds-example\">гараж в Красно село довечера</button></div>",
+      "css": ".ds-examples { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; } .ds-example { font-family: Rubik, system-ui, sans-serif; flex: none; font-size: 13px; line-height: 17px; min-height: 36px; padding: 0 12px; border: none; border-radius: 999px; background: #E2DFD5; color: #23272B; white-space: nowrap; cursor: pointer; transition: transform 0.12s ease-out; } .ds-example:hover { background: #CFCBC0; } .ds-example:active { transform: scale(0.96); } .ds-example:focus-visible { outline: 2px solid #23272B; outline-offset: 2px; }"
+    },
+    {
+      "name": "Navigation (tab bar)",
+      "kind": "nav",
+      "refersTo": null,
+      "description": "Floating whitewash pill tab bar on phone; the active tab is a graphite pill.",
+      "html": "<nav class=\"ds-tabs\"><a class=\"ds-tab ds-tab-on\" href=\"#\"><i></i>Търси</a><a class=\"ds-tab\" href=\"#\"><i></i>Резервации</a><a class=\"ds-tab\" href=\"#\"><i></i>Профил</a></nav>",
+      "css": ".ds-tabs { display: flex; justify-content: space-around; align-items: center; height: 80px; border-radius: 40px; border: 1px solid #CFCBC0; background: #F8F7F3; box-shadow: 0px 10px 28px rgba(35, 39, 43, 0.16); padding: 0 16px; font-family: Rubik, system-ui, sans-serif; } .ds-tab { display: flex; flex-direction: column; align-items: center; gap: 2px; font-weight: 600; font-size: 12px; line-height: 16px; color: #5B6067; text-decoration: none; } .ds-tab i { display: block; width: 56px; height: 32px; border-radius: 999px; background: no-repeat center / 20px url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235B6067' stroke-width='2.2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E\"); } .ds-tab:hover { color: #23272B; } .ds-tab:focus-visible { outline: 2px solid #23272B; outline-offset: 2px; border-radius: 8px; } .ds-tab-on { color: #23272B; } .ds-tab-on i { background-color: #23272B; background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F8F7F3' stroke-width='2.2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E\"); }"
+    },
+    {
+      "name": "Door Tile",
+      "kind": "custom",
+      "refersTo": "door-tile",
+      "description": "A garage's painted door with lintel, ribs and the stencilled size letter; colour from doorPaint(id).",
+      "html": "<div class=\"ds-doors\"><div class=\"ds-door\"><span>М</span></div><div class=\"ds-door ds-p2\"><span>С</span></div><div class=\"ds-door ds-p3\"><span>Г</span></div><div class=\"ds-door ds-p4\"><span>С</span></div><div class=\"ds-door ds-p5\"><span>М</span></div><div class=\"ds-door ds-p6\"><span>Г</span></div></div>",
+      "css": ".ds-doors { display: flex; gap: 6px; } .ds-door { position: relative; flex: none; width: 58px; height: 66px; border-radius: 3px; overflow: hidden; background-color: #4E8576; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px; box-sizing: border-box; background-image: linear-gradient(rgba(0,0,0,0.22),rgba(0,0,0,0.22)), repeating-linear-gradient(to bottom, transparent 0 4px, rgba(0,0,0,0.16) 4px 5px, transparent 5px 6px); background-size: 100% 6px, 100% calc(100% - 20px); background-position: 0 0, 0 10px; background-repeat: no-repeat, no-repeat; } .ds-door span { font-family: Oswald, 'Arial Narrow', sans-serif; font-weight: 700; letter-spacing: 1px; color: #FFFFFF; font-size: 28px; line-height: 33px; } .ds-p2 { background-color: #A8702A; } .ds-p3 { background-color: #9A4236; } .ds-p4 { background-color: #4A729C; } .ds-p5 { background-color: #6D7342; } .ds-p6 { background-color: #6B587C; }"
+    },
+    {
+      "name": "Garage Row",
+      "kind": "card",
+      "refersTo": null,
+      "description": "Compact flat list row between hairlines: door tile, one-line title, one meta line, rating and phone icon, right-aligned price.",
+      "html": "<div class=\"ds-row\" tabindex=\"0\"><div class=\"ds-rdoor\"><span>С</span></div><div class=\"ds-rbody\"><b>Гараж до блок 12</b><small>Лагера, 350 м, среден, покрит</small><em>&#9733; 4.8 <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect x=\"6\" y=\"2\" width=\"12\" height=\"20\" rx=\"2.5\" fill=\"#23272B\"/><rect x=\"10\" y=\"18\" width=\"4\" height=\"1.6\" rx=\"0.8\" fill=\"#F8F7F3\"/></svg></em></div><div class=\"ds-rprice\"><b>3,00 лв.</b><small>на час</small><small>18,00 лв. на ден</small></div></div>",
+      "css": ".ds-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #CFCBC0; font-family: Rubik, system-ui, sans-serif; cursor: pointer; transition: opacity 0.12s; } .ds-row:hover { opacity: 0.85; } .ds-row:active { opacity: 0.75; } .ds-row:focus-visible { outline: 2px solid #23272B; outline-offset: 2px; } .ds-rdoor { position: relative; flex: none; width: 58px; height: 66px; border-radius: 3px; overflow: hidden; background-color: #A8702A; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px; box-sizing: border-box; background-image: linear-gradient(rgba(0,0,0,0.22),rgba(0,0,0,0.22)), repeating-linear-gradient(to bottom, transparent 0 4px, rgba(0,0,0,0.16) 4px 5px, transparent 5px 6px); background-size: 100% 6px, 100% calc(100% - 20px); background-position: 0 0, 0 10px; background-repeat: no-repeat, no-repeat; } .ds-rdoor span { font-family: Oswald, 'Arial Narrow', sans-serif; font-weight: 700; letter-spacing: 1px; color: #FFFFFF; font-size: 28px; line-height: 33px; } .ds-rbody { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; } .ds-rbody b { font-weight: 500; font-size: 16px; line-height: 21px; color: #23272B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-row small { font-size: 13px; line-height: 17px; color: #5B6067; white-space: nowrap; } .ds-rbody em { font-style: normal; display: flex; align-items: center; gap: 8px; margin-top: 2px; font-size: 13px; color: #23272B; } .ds-rprice { display: flex; flex-direction: column; align-items: flex-end; font-variant-numeric: tabular-nums; } .ds-rprice b { font-weight: 600; font-size: 22px; line-height: 26px; letter-spacing: -0.3px; color: #23272B; }"
+    },
+    {
+      "name": "Map Pin",
+      "kind": "custom",
+      "refersTo": "map-pin",
+      "description": "Graphite price pill led by a swatch of the door paint; selected pins are ringed in that paint.",
+      "html": "<div class=\"ds-pins\"><span class=\"ds-pin\" tabindex=\"0\"><i style=\"background:#4A729C\"></i>3 лв.</span><span class=\"ds-pin ds-pin-on\" tabindex=\"0\"><i style=\"background:#9A4236\"></i>4 лв.</span></div>",
+      "css": ".ds-pins { display: flex; gap: 10px; padding: 12px; background: #E2DFD5; border-radius: 12px; } .ds-pin { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 5px; border-radius: 4px; border: 2px solid #FFFFFF; background: #23272B; color: #F8F7F3; font-family: Rubik, system-ui, sans-serif; font-weight: 500; font-size: 13px; font-variant-numeric: tabular-nums; cursor: pointer; transition: transform 0.12s; } .ds-pin i { width: 12px; height: 14px; border-radius: 2px; } .ds-pin:hover { transform: translateY(-1px); } .ds-pin:focus-visible { outline: 2px solid #23272B; outline-offset: 2px; } .ds-pin-on { border-color: #9A4236; }"
+    },
+    {
+      "name": "Number Plate Strip",
+      "kind": "chip",
+      "refersTo": "plate",
+      "description": "\"What I understood\" filter on Find: a white plate strip with the EU-plate-blue band.",
+      "html": "<div class=\"ds-plates\"><span class=\"ds-plate\"><i></i>Лозенец</span><span class=\"ds-plate\"><i></i>утре 09:00–18:00</span></div>",
+      "css": ".ds-plates { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: #EDEBE4; } .ds-plate { display: inline-flex; align-items: stretch; min-height: 32px; border-radius: 4px; overflow: hidden; background: #FFFFFF; font-family: Rubik, system-ui, sans-serif; font-weight: 500; font-size: 14px; line-height: 32px; color: #23272B; padding-right: 10px; gap: 10px; font-variant-numeric: tabular-nums; } .ds-plate i { width: 10px; background: #1F3FA6; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Гаражни клетки (the garage rows)",
+    "overview": "Behind every block of panel flats stands a row of small metal garages, each door painted a different, faded colour by whoever owns it. GarageGo is that row. The ground is light concrete with whitewashed rows and graphite ink; the only saturated colour in the app belongs to the doors themselves, and every garage keeps the same door, in the same paint, on every screen and every visit. A renter recognises a garage by its door in Find, on the garage page, on the map and in Bookings, and at the garage taps Open and watches that same door roll up.\n\nThe surface is calm and flat: hairline-ruled lists, small steel-and-concrete radii, one ochre action per screen. The one bold moment is the roller door on the active booking. Everything else stays quiet so that moment carries. The app is adaptive (Expo, phone first, web secondary), Bulgarian first with English second, and every face covers Cyrillic.",
+    "keyCharacteristics": [
+      "Light concrete ground, graphite ink, graphite chrome and selection.",
+      "Six deepened door paints, one per garage for good, are the only saturated colours besides the ochre action.",
+      "Corrugated door tiles with a stencilled size letter (М / С / Г, or S / M / L) in a condensed heavy face.",
+      "Flat rows between hairlines; cards only for single objects.",
+      "One roll per door state change, ease-out; crossfade under Reduce Motion; no other decorative motion."
+    ],
+    "rules": [
+      {
+        "name": "The Paint Belongs to the Door Rule",
+        "body": "Saturated colour appears only as a garage's door paint or as the ochre action. Chrome, selection, focus and links are graphite. If a new element wants a brand colour, it is graphite.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Garage, One Door Rule",
+        "body": "A garage's colour always comes from `doorPaint(garage.id)`, never picked by hand, so it is the same door in every list, page, pin and booking.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ochre Opens Rule",
+        "body": "Ochre always means \"go forward\" or \"open the door\". One ochre button per screen. On the active booking Open is ochre and Close is graphite.",
+        "section": "colors"
+      },
+      {
+        "name": "The Stencil Is Paint Rule",
+        "body": "The stencil face appears only as a single letter painted on a door (size letter, or the logo's G). Never for headings, labels or numbers.",
+        "section": "typography"
+      },
+      {
+        "name": "The Still Numbers Rule",
+        "body": "Prices, times, durations and countdowns use Figure, Figure Small or `typography.tabular` so digits don't jitter.",
+        "section": "typography"
+      },
+      {
+        "name": "The Only Floating Things Rule",
+        "body": "A shadow means \"this floats over the page\". Rows, cards and tickets never get one.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do take every garage's colour from `doorPaint(garage.id)` and show it wherever that garage appears.",
+      "Do keep chrome, selection, focus and links graphite (`accent` equals `ink`).",
+      "Do use exactly one ochre button per screen; Open is ochre, Close is graphite.",
+      "Do keep text contrast at 4.5:1 or more (3:1 only for large text, icons and door stencils) and touch targets at 44pt or more.",
+      "Do keep lists as flat rows between hairlines, and use the same verb through a flow: Open, Opening…, Opened 02:37.",
+      "Do check every face covers Bulgarian Cyrillic before adding it, and write Bulgarian first.",
+      "Do check the phone layout (390x844) and the wide layout (1024 and up): nothing hidden behind the floating tab bar, tab labels visible.",
+      "Do run `npx tsc --noEmit` and `npx expo lint` before calling a change done.",
+      "Do test the door states with the fake device: `node server/fake-device.js`, and the error mode (PowerShell `$env:FAIL=1; node server/fake-device.js`, cmd `set FAIL=1&& node server/fake-device.js`)."
+    ],
+    "donts": [
+      "Don't hardcode a hex in a screen; the only literals are the named material constants (EU plate blue, bay dark).",
+      "Don't introduce a brand colour for chrome, or a second saturated accent outside the door paints.",
+      "Don't reorder `doorPaints`: every garage would change door.",
+      "Don't use the stencil face for anything but a letter on a door.",
+      "Don't put shadows on rows, cards or tickets, or add gradients or decorative motion; the door roll is the only motion moment.",
+      "Don't add eyebrow labels above headings that repeat them."
+    ]
+  }
+}

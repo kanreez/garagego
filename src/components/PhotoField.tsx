@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   emptyText: { ...typography.body, color: colors.textMuted, textAlign: "center" },
-  veil: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, alignItems: "center", justifyContent: "center", gap: spacing.sm, backgroundColor: "rgba(21, 23, 26, 0.6)" },
+  veil: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, alignItems: "center", justifyContent: "center", gap: spacing.sm, backgroundColor: "rgba(35, 39, 43, 0.6)" },
   veilText: { ...typography.label, color: colors.ink },
   row: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
 });

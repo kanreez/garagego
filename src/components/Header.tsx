@@ -9,20 +9,17 @@ import { goBack } from "../utils/navigation";
 type Props = {
   title: string;
   subtitle?: string;
-  eyebrow?: string; // small uppercase line above the title
-  eyebrowColor?: string;
   back?: boolean; // show a back arrow
   backTo?: Href; // where the arrow goes when there's no previous screen (page opened directly)
   right?: ReactNode; // e.g. an icon button or avatar
 };
 
-export function Header({ title, subtitle, eyebrow, eyebrowColor = colors.accentDeep, back, backTo = "/", right }: Props) {
+export function Header({ title, subtitle, back, backTo = "/", right }: Props) {
   return (
     <View style={styles.row}>
       <View style={styles.left}>
         {back ? <IconButton icon="arrow-back" label={t("common.back")} onPress={() => goBack(backTo)} /> : null}
         <View style={styles.texts}>
-          {eyebrow ? <Text style={[styles.eyebrow, { color: eyebrowColor }]}>{eyebrow}</Text> : null}
           <Text style={styles.title} numberOfLines={2}>
             {title}
           </Text>
@@ -71,7 +68,6 @@ const styles = StyleSheet.create({
   },
   left: { flexDirection: "row", alignItems: "center", gap: spacing.md, flex: 1 },
   texts: { flex: 1, gap: 2 },
-  eyebrow: { ...typography.eyebrow, marginBottom: 2 },
   title: { ...typography.h1, color: colors.ink },
   subtitle: { ...typography.body, color: colors.textMuted },
   iconBtn: {

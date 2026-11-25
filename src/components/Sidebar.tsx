@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   itemOn: { backgroundColor: colors.accent },
   itemHover: { backgroundColor: colors.sand },
   label: { ...typography.label, fontSize: 15, color: colors.textMuted },
-  host: { gap: spacing.sm, padding: spacing.md, borderRadius: radius.lg, backgroundColor: colors.accentSoft },
+  host: { gap: spacing.sm, padding: spacing.md, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   hostTitle: { ...typography.h3, color: colors.ink },
   hostBody: { ...typography.caption, color: colors.textMuted, marginBottom: spacing.xs },
 });

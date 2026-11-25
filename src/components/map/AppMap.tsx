@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-import { colors, radius, typography } from "../../constants/theme";
+import { colors, doorPaint, radius, typography } from "../../constants/theme";
 import { AppMapProps, DEFAULT_ZOOM } from "./types";
 
 // Phone map (react-native-maps: Apple Maps on iOS, Google Maps on Android, works in Expo Go).
 // The browser gets AppMap.web.tsx instead, since react-native-maps has no web support.
-export function AppMap({ center, zoom = DEFAULT_ZOOM, recenterKey, pins = [], selectedId, onSelectPin, picked, onPick, fitToPins, interactive = true, style }: AppMapProps) {
+export function AppMap({ center, zoom = DEFAULT_ZOOM, recenterKey, pins = [], selectedId, onSelectPin, picked, pickedPaint, onPick, fitToPins, interactive = true, style }: AppMapProps) {
   const ref = useRef<MapView>(null);
   // Roughly the span a web zoom level shows, so both platforms frame the same area
   const delta = 360 / 2 ** zoom;
@@ -57,8 +57,9 @@ export function AppMap({ center, zoom = DEFAULT_ZOOM, recenterKey, pins = [], se
               onPress={() => onSelectPin?.(p.id)}
               zIndex={selected ? 2 : 1}
             >
-              <View style={[styles.pill, selected && styles.pillOn]}>
-                <Text style={[styles.pillText, selected && { color: colors.onAccent }]}>{p.label}</Text>
+              <View style={[styles.pill, selected && { borderColor: doorPaint(p.id) }]}>
+                <View style={[styles.swatch, { backgroundColor: doorPaint(p.id) }]} />
+                <Text style={styles.pillText}>{p.label}</Text>
               </View>
             </Marker>
           );
@@ -68,7 +69,7 @@ export function AppMap({ center, zoom = DEFAULT_ZOOM, recenterKey, pins = [], se
             coordinate={picked}
             draggable={!!onPick}
             onDragEnd={onPick ? (e) => onPick(e.nativeEvent.coordinate) : undefined}
-            pinColor={colors.accent}
+            pinColor={pickedPaint ?? colors.ink}
           />
         ) : null}
       </MapView>
@@ -78,14 +79,19 @@ export function AppMap({ center, zoom = DEFAULT_ZOOM, recenterKey, pins = [], se
 
 const styles = StyleSheet.create({
   wrap: { overflow: "hidden", borderRadius: radius.lg, backgroundColor: colors.sand },
+  // Graphite price pill led by the garage's door paint; selected: ringed in that paint
   pill: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: radius.pill,
-    backgroundColor: colors.background,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingLeft: 5,
+    paddingRight: 10,
+    paddingVertical: 4,
+    borderRadius: radius.sm,
+    backgroundColor: colors.ink,
     borderWidth: 2,
     borderColor: colors.white,
   },
-  pillOn: { backgroundColor: colors.accent },
-  pillText: { ...typography.label, fontSize: 13, color: colors.ink },
+  swatch: { width: 12, height: 14, borderRadius: 2 },
+  pillText: { ...typography.label, fontSize: 13, color: colors.onInk },
 });
