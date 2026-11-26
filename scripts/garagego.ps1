@@ -162,6 +162,14 @@ function Publish-Site([string]$ApiUrl) {
         }
       }
     }
+    # Make the site installable: Expo's single-page output ignores a custom html template, so the
+    # manifest / icon / iPhone tags (scripts/pwa-head.html) are added to the built index.html here.
+    $indexPath = Join-Path $Root "dist\index.html"
+    $pwaHead = [System.IO.File]::ReadAllText((Join-Path $PSScriptRoot "pwa-head.html")).Trim()
+    $html = [System.IO.File]::ReadAllText($indexPath)
+    $html = $html.Replace('<html lang="en">', '<html lang="bg">').Replace('shrink-to-fit=no" />', 'shrink-to-fit=no, viewport-fit=cover" />')
+    $html = $html.Replace('<link rel="icon" href="/favicon.ico"/>', '').Replace("</head>", "$pwaHead`n</head>")
+    [System.IO.File]::WriteAllText($indexPath, $html, (New-Object System.Text.UTF8Encoding($false)))
     Write-Host "Publishing to Cloudflare Pages ($PagesProject.pages.dev) ..."
     # Run wrangler outside the project: in a project folder it may rewrite package.json and add its
     # own config while "helping". The Pages project must exist; on a new Cloudflare account create it
