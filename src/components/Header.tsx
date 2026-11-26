@@ -3,7 +3,7 @@ import { Href } from "expo-router";
 import { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors, shadow, spacing, typography } from "../constants/theme";
-import { t } from "../i18n";
+import { t, useT } from "../i18n";
 import { goBack } from "../utils/navigation";
 
 type Props = {
@@ -15,6 +15,7 @@ type Props = {
 };
 
 export function Header({ title, subtitle, back, backTo = "/", right }: Props) {
+  useT(); // re-render in a new language
   return (
     <View style={styles.row}>
       <View style={styles.left}>
