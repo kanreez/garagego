@@ -16,6 +16,7 @@ export const en = {
   "steps.find": "Find",
   "steps.book": "Book",
   "steps.open": "Open",
+  "err.generic": "Something went wrong. Please try again.",
   "err.badLogin": "Wrong username, email or password",
   "err.confirmEmail": "Confirm your email first: check your inbox",
   "err.tooManyTries": "Too many tries. Wait a few minutes and try again.",

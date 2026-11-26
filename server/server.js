@@ -82,8 +82,10 @@ async function requireDevice(req, res, next) {
 }
 
 // Wraps a route so thrown errors become a 500 with the message (a PaymentError keeps its own status)
+// A raw upstream error (e.g. a Cloudflare HTML block page from Supabase) must never reach the app
+const safeMessage = (m) => (typeof m === "string" && m.length <= 160 && !/[<>]/.test(m) ? m : "Something went wrong. Please try again.");
 const route = (fn) => (req, res) =>
-  fn(req, res).catch((err) => res.status(err instanceof PaymentError ? err.status : 500).json({ error: err.message }));
+  fn(req, res).catch((err) => res.status(err instanceof PaymentError ? err.status : 500).json({ error: err instanceof PaymentError ? err.message : safeMessage(err.message) }));
 
 app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
 // Without a web build next to it, "/" answers like the health check (see WEB_DIR below)

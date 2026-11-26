@@ -78,5 +78,8 @@ export function translateError(message: string): string {
     const m = message.match(re);
     if (m) return make(m);
   }
+  // Never show a raw HTML page (e.g. a Cloudflare block) or a long unknown dump to the user
+  const looksLikeHtml = message.includes("<") && /<\/?[a-z!]/i.test(message);
+  if (!message.trim() || looksLikeHtml || message.length > 160) return t("err.generic");
   return message;
 }

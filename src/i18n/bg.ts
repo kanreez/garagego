@@ -18,6 +18,7 @@ export const bg: Record<keyof typeof en, string> = {
   "steps.find": "Търси",
   "steps.book": "Резервирай",
   "steps.open": "Отвори",
+  "err.generic": "Нещо се обърка. Опитай пак.",
   "err.badLogin": "Грешно потребителско име, имейл или парола",
   "err.confirmEmail": "Първо потвърди имейла си: провери пощата",
   "err.tooManyTries": "Твърде много опити. Изчакай няколко минути и опитай пак.",
