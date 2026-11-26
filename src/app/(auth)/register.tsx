@@ -6,6 +6,7 @@ import { BrandMark } from "../../components/BrandMark";
 import { APP_TAGLINE } from "../../constants/app";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
+import { PhoneField } from "../../components/PhoneField";
 import { ScreenWrapper } from "../../components/ScreenWrapper";
 import { authStyles as styles } from "../../constants/authStyles";
 import { colors, typography } from "../../constants/theme";
@@ -18,18 +19,24 @@ export default function Register() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [phonePublic, setPhonePublic] = useState(true);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   // Shown inline: Alert.alert does nothing on web
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
 
+  // A phone problem is shown under the phone field, everything else under the password
+  const phoneError = error === t("phone.required") || error === t("err.phoneInvalid");
+
   const onSubmit = async () => {
     try {
       setLoading(true);
       setError("");
       setInfo("");
-      const r = await signup({ firstName: firstName.trim(), lastName: lastName.trim(), email: email.trim(), password });
+      if (!phone.trim()) throw new Error(t("phone.required"));
+      const r = await signup({ firstName: firstName.trim(), lastName: lastName.trim(), email: email.trim(), phone, phonePublic, password });
       // With a session the app moves on by itself; otherwise the account waits for the email link
       if (r.needsConfirmation) {
         setInfo(r.username ? t("register.confirmWithUsername", { username: r.username }) : t("register.confirm"));
@@ -68,6 +75,7 @@ export default function Register() {
           value={email}
           onChangeText={setEmail}
         />
+        <PhoneField phone={phone} onPhoneChange={setPhone} isPublic={phonePublic} onPublicChange={setPhonePublic} error={phoneError ? error : undefined} />
         <Input
           label={t("auth.password")}
           placeholder={t("register.passwordPlaceholder")}
@@ -78,7 +86,7 @@ export default function Register() {
           value={password}
           onChangeText={setPassword}
           onSubmitEditing={onSubmit}
-          error={error}
+          error={phoneError ? undefined : error}
         />
         <Button title={t("register.submit")} variant="accent" loading={loading} onPress={onSubmit} style={styles.submit} />
         {info ? <Text style={{ ...typography.label, color: colors.success }}>{info}</Text> : null}

@@ -62,6 +62,7 @@ const EXACT: Record<string, TKey> = {
   "This isn't your payment": "err.notYourPayment",
   "Invalid dates": "err.invalidDates",
   "Missing query": "err.missingQuery",
+  "Enter a valid phone number, e.g. +359 88 123 4567": "err.phoneInvalid",
   "pick at least one day the garage is free, or make it free any time": "err.pickFreeDay",
   "availability must be a list of weekly hours": "err.availabilityInvalid",
   "availability can have one window per day": "err.availabilityInvalid",

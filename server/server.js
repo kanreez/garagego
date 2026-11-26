@@ -10,6 +10,7 @@ const { askAnthropic } = require("./anthropic");
 const G = require("./garages");
 const { createRepo } = require("./repo");
 const U = require("./usernames");
+const P = require("./phones");
 const geo = require("./geocode");
 const photos = require("./photos");
 const { createPaymentProvider, PaymentError } = require("./payments/provider");
@@ -99,8 +100,40 @@ app.get("/api/me", requireAuth, async (req, res) => {
     .maybeSingle();
 
   if (error) return res.status(500).json({ error: error.message });
-  res.json({ user: { id: req.user.id, email: req.user.email }, profile: data });
+  res.json({ user: { id: req.user.id, email: req.user.email }, profile: data, phone: P.phoneOf(req.user) });
 });
+
+// Body: { phone, public } -> { phone: { number, public } }. Everyone must have one (the app asks
+// before anything else); public decides who sees it on the host's garages.
+app.put("/api/me/phone", requireAuth, route(async (req, res) => {
+  const { metadata, error } = P.phoneMetadata(req.body);
+  if (error) return res.status(400).json({ error });
+  const { error: e } = await supabase.auth.admin.updateUserById(req.user.id, { app_metadata: { ...req.user.app_metadata, ...metadata } });
+  if (e) throw new Error(e.message);
+  hostUsers.delete(req.user.id);
+  res.json({ phone: { number: metadata.phone, public: metadata.phone_public } });
+}));
+
+// Host accounts, looked up for their phone; kept a minute so a busy garage page doesn't ask every time
+const HOST_CACHE_MS = 60000;
+const hostUsers = new Map();
+async function hostUser(id) {
+  const hit = hostUsers.get(id);
+  if (hit && Date.now() - hit.at < HOST_CACHE_MS) return hit.user;
+  const { data } = await supabase.auth.admin.getUserById(id).catch(() => ({ data: null }));
+  const user = data?.user ?? null;
+  hostUsers.set(id, { user, at: Date.now() });
+  return user;
+}
+
+// The host's phone as this viewer may see it: { number, public } or { number: null, hidden: true }
+// when it's private and they haven't paid for a booking of this garage; null when there is none
+async function hostPhoneFor(garage, viewerId, paidHere) {
+  const phone = P.phoneOf(await hostUser(garage.host_id));
+  if (!phone) return null;
+  if (phone.public || garage.host_id === viewerId || paidHere) return phone;
+  return { number: null, public: false, hidden: true };
+}
 
 // ==========================================
 // Accounts: log in with a username or email, sign up with a picked username, change it later
@@ -159,6 +192,8 @@ app.post("/api/auth/signup", route(async (req, res) => {
   const password = String(req.body?.password ?? "");
   if (!first || !last) return res.status(400).json({ error: "Enter your first and last name" });
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: "Enter a valid email" });
+  const phone = P.phoneMetadata(req.body);
+  if (phone.error) return res.status(400).json({ error: phone.error });
   if (password.length < 6) return res.status(400).json({ error: "Use at least 6 characters for the password" });
 
   const fullName = `${first} ${last}`;
@@ -168,6 +203,8 @@ app.post("/api/auth/signup", route(async (req, res) => {
   if (!data.user || data.user.identities?.length === 0) {
     return res.status(409).json({ error: "An account with this email already exists. Log in instead." });
   }
+  const { error: phoneError } = await supabase.auth.admin.updateUserById(data.user.id, { app_metadata: { ...data.user.app_metadata, ...phone.metadata } });
+  if (phoneError) throw new Error(phoneError.message);
 
   // The database trigger has made the profile row; give it the name and a free username.
   // Two sign-ups can race for the same one, so retry when the unique index says it's gone.
@@ -407,8 +444,10 @@ app.get("/api/garages/:id", requireAuth, route(async (req, res) => {
     repo.listReviewsForGarage(garage.id),
     repo.ratingSummaries(),
   ]);
+  const paidHere = bookings.some((b) => b.renter_id === req.user.id && b.status === "paid");
   res.json({
     garage: { ...(isHost ? garage : G.publicGarage(garage)), rating: ratings.get(garage.id) ?? NO_RATING },
+    host_phone: await hostPhoneFor(garage, req.user.id, paidHere),
     busy: busySlots(bookings.filter((b) => new Date(b.ends_at) > new Date())),
     reviews: reviews.map(publicReview),
   });
@@ -754,10 +793,14 @@ app.get("/api/bookings/mine", requireAuth, route(async (req, res) => {
   const byId = new Map(garages.map((g) => [g.id, G.publicGarage(g)]));
   const payByBooking = new Map(pays.map((p) => [p.booking_id, p]));
   const reviewByBooking = new Map(reviews.map((r) => [r.booking_id, publicReview(r)]));
+  // A paid booking always shows the host's phone, public or not: the renter may need to call
+  const hostIds = [...new Set(bookings.filter((b) => b.status === "paid").map((b) => byId.get(b.garage_id)?.host_id).filter(Boolean))];
+  const hostPhones = new Map(await Promise.all(hostIds.map(async (id) => [id, P.phoneOf(await hostUser(id))?.number ?? null])));
   res.json({
     bookings: bookings.map((b) => ({
       ...b,
       garage: byId.get(b.garage_id) ?? null,
+      host_phone: b.status === "paid" ? hostPhones.get(byId.get(b.garage_id)?.host_id) ?? null : null,
       payment: paymentSummary(payByBooking.get(b.id)) ?? null,
       review: reviewByBooking.get(b.id) ?? null,
     })),

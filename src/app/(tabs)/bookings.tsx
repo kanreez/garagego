@@ -8,6 +8,7 @@ import { DoorPanel, DoorVisual } from "../../components/DoorPanel";
 import { DoorTile } from "../../components/DoorTile";
 import { canReview, ReviewBox } from "../../components/ReviewBox";
 import { Header } from "../../components/Header";
+import { CallHost } from "../../components/HostPhone";
 import { ScreenWrapper } from "../../components/ScreenWrapper";
 import { EmptyState, ErrorState, Loading } from "../../components/StateViews";
 import { notify } from "../../components/Toast";
@@ -315,6 +316,7 @@ function BookingRow({ booking, now, note, muted, onChanged, onReviewed }: RowPro
             ) : null}
           </View>
           {shown ? <Text style={styles.note}>{shown}</Text> : null}
+          {booking.host_phone ? <CallHost number={booking.host_phone} /> : null}
         </View>
         <Text style={[styles.price, booking.status === "cancelled" && styles.struck]}>{formatCents(amount)}</Text>
       </View>

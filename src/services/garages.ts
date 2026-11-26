@@ -1,4 +1,4 @@
-import { Booking, BookingMode, BusySlot, Checkout, Command, DoorAction, Garage, GarageInput, Review, SearchResult } from "../types/garage";
+import { Booking, BookingMode, BusySlot, Checkout, Command, DoorAction, Garage, GarageInput, HostPhone, Review, SearchResult } from "../types/garage";
 import { toLocalIso } from "../utils/booking";
 import { api } from "./api";
 
@@ -11,7 +11,7 @@ export async function listGarages() {
 }
 
 export async function getGarage(id: string) {
-  return api.get<{ garage: Garage; busy: BusySlot[]; reviews: Review[] }>(`/api/garages/${id}`);
+  return api.get<{ garage: Garage; host_phone: HostPhone | null; busy: BusySlot[]; reviews: Review[] }>(`/api/garages/${id}`);
 }
 
 // Plain-language request -> AI filters + matching garages

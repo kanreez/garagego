@@ -12,6 +12,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
+import { PhoneGate } from "../components/PhoneGate";
 import { ToastProvider } from "../components/Toast";
 import { colors } from "../constants/theme";
 import { AuthProvider, useAuth } from "../context/AuthContext";
@@ -41,14 +42,16 @@ function RootNavigator() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="(auth)" />
-      <Stack.Screen name="garage/[id]" />
-      <Stack.Screen name="host/index" />
-      <Stack.Screen name="host/new" />
-      <Stack.Screen name="settings" />
-    </Stack>
+    <PhoneGate>
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="garage/[id]" />
+        <Stack.Screen name="host/index" />
+        <Stack.Screen name="host/new" />
+        <Stack.Screen name="settings" />
+      </Stack>
+    </PhoneGate>
   );
 }
 

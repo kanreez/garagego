@@ -9,6 +9,7 @@ import { Card } from "../../components/Card";
 import { ChipRow } from "../../components/Chip";
 import { DoorTile } from "../../components/DoorTile";
 import { Header } from "../../components/Header";
+import { CallHost } from "../../components/HostPhone";
 import { AppMap } from "../../components/map/AppMap";
 import { PaySheet } from "../../components/PaySheet";
 import { ScreenWrapper } from "../../components/ScreenWrapper";
@@ -23,7 +24,7 @@ import { useIsWide } from "../../hooks/useIsWide";
 import { useT } from "../../i18n";
 import { createBooking, getGarage } from "../../services/garages";
 import { cancelBooking } from "../../services/payments";
-import { BookingMode, BusySlot, Checkout, Garage, RatingSummary, Review } from "../../types/garage";
+import { BookingMode, BusySlot, Checkout, Garage, HostPhone, RatingSummary, Review } from "../../types/garage";
 import {
   addDays,
   addHours,
@@ -71,7 +72,7 @@ export default function Book() {
       </ScreenWrapper>
     );
   }
-  return <BookForm garage={data.garage} busy={data.busy} reviews={data.reviews ?? []} from={from} to={to} />;
+  return <BookForm garage={data.garage} hostPhone={data.host_phone ?? null} busy={data.busy} reviews={data.reviews ?? []} from={from} to={to} />;
 }
 
 // Where the picker starts: the time the AI understood if there was one, else from this hour
@@ -96,7 +97,7 @@ function initialPick(from?: string, to?: string) {
   return { mode: "hour" as BookingMode, day: startOfDay(minStart), startHour: minStart.getHours(), hours: 2, days: 1 };
 }
 
-function BookForm({ garage, busy, reviews, from, to }: { garage: Garage; busy: BusySlot[]; reviews: Review[]; from?: string; to?: string }) {
+function BookForm({ garage, hostPhone, busy, reviews, from, to }: { garage: Garage; hostPhone: HostPhone | null; busy: BusySlot[]; reviews: Review[]; from?: string; to?: string }) {
   const { t, tn } = useT();
   const modes = [
     { value: "hour", label: t("book.byHour") },
@@ -187,6 +188,12 @@ function BookForm({ garage, busy, reviews, from, to }: { garage: Garage; busy: B
         <Fact label={t("book.perHour")} value={formatMoney(garage.price_hour)} figure />
         <Fact label={t("book.perDay")} value={formatMoney(garage.price_day)} figure />
         <Fact label={t("book.free")} value={summarizeAvailability(garage.availability)} />
+        {hostPhone ? (
+          <View style={styles.fact}>
+            <Text style={styles.factLabel}>{t("phone.host")}</Text>
+            {hostPhone.number ? <CallHost number={hostPhone.number} /> : <Text style={[styles.meta, { flex: 1 }]}>{t("phone.hiddenUntilPaid")}</Text>}
+          </View>
+        ) : null}
       </View>
       {garage.description ? <Text style={styles.description}>{garage.description}</Text> : null}
       <Button title={t("book.directions")} icon="navigate" variant="secondary" size="sm" onPress={() => openDirections(garage)} style={{ alignSelf: "flex-start", marginTop: spacing.md }} />

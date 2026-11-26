@@ -65,6 +65,9 @@ export type GarageInput = Pick<
 
 export type BusySlot = { starts_at: string; ends_at: string };
 
+// The host's phone on a garage page. hidden: it's private and shows once you've paid for a booking here.
+export type HostPhone = { number: string; public: boolean } | { number: null; public: false; hidden: true };
+
 // pending_payment holds the slot until expires_at; only "paid" can open the door
 export type BookingStatus = "pending_payment" | "paid" | "cancelled" | "expired";
 
@@ -84,6 +87,7 @@ export type Booking = {
   garage: Garage | null;
   payment: PaymentSummary | null;
   review: Review | null; // the renter's own review of this stay
+  host_phone?: string | null; // a paid booking always shows the host's number
 };
 
 // ---------- payments (mock provider on the server; amounts in euro cents) ----------

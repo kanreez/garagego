@@ -5,6 +5,8 @@ import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { Header } from "../components/Header";
 import { Input } from "../components/Input";
+import { formatPhone } from "../components/HostPhone";
+import { PhoneField } from "../components/PhoneField";
 import { ScreenWrapper } from "../components/ScreenWrapper";
 import { ErrorState, Loading } from "../components/StateViews";
 import { notify } from "../components/Toast";
@@ -12,11 +14,11 @@ import { colors, spacing, typography } from "../constants/theme";
 import { useAsync } from "../hooks/useAsync";
 import { LANGS, useLanguage, useT } from "../i18n";
 import { translateError } from "../i18n/errors";
-import { checkUsername, getMe, saveUsername } from "../services/account";
+import { checkUsername, getMe, Phone, savePhone, saveUsername } from "../services/account";
 
 const CHECK_DELAY_MS = 400; // wait for a pause in typing before asking the server
 
-// Settings: change your username (if it's free) and the app's language
+// Settings: change your username (if it's free), your phone and who sees it, and the language
 export default function Settings() {
   const { t } = useT();
   const { data, loading, error, reload, setData } = useAsync(getMe);
@@ -29,10 +31,13 @@ export default function Settings() {
       ) : error || !data ? (
         <ErrorState message={error ?? ""} onRetry={reload} />
       ) : (
-        <UsernameCard
-          current={data.profile?.username ?? null}
-          onSaved={(username) => setData({ ...data, profile: { full_name: data.profile?.full_name ?? null, username } })}
-        />
+        <>
+          <UsernameCard
+            current={data.profile?.username ?? null}
+            onSaved={(username) => setData({ ...data, profile: { full_name: data.profile?.full_name ?? null, username } })}
+          />
+          <PhoneCard current={data.phone} onSaved={(phone) => setData({ ...data, phone })} />
+        </>
       )}
       <LanguageCard />
     </ScreenWrapper>
@@ -119,6 +124,39 @@ function UsernameCard({ current, onSaved }: { current: string | null; onSaved: (
         onPress={save}
         style={{ alignSelf: "flex-start" }}
       />
+    </Card>
+  );
+}
+
+function PhoneCard({ current, onSaved }: { current: Phone | null; onSaved: (p: Phone) => void }) {
+  const { t } = useT();
+  const [phone, setPhone] = useState(current ? formatPhone(current.number) : "");
+  const [isPublic, setIsPublic] = useState(current?.public ?? true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const unchanged = !!current && phone.trim() === formatPhone(current.number) && isPublic === current.public;
+
+  const save = async () => {
+    if (!phone.trim()) return setError(t("phone.required"));
+    try {
+      setSaving(true);
+      setError("");
+      const saved = await savePhone(phone, isPublic);
+      setPhone(formatPhone(saved.number));
+      onSaved(saved);
+      notify(t("phone.saved"));
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Card style={styles.group}>
+      <Text style={styles.groupTitle}>{t("phone.label")}</Text>
+      <PhoneField phone={phone} onPhoneChange={(v) => { setPhone(v); setError(""); }} isPublic={isPublic} onPublicChange={setIsPublic} error={error} onSubmitEditing={save} showChangeNote={false} />
+      <Button title={t("phone.save")} variant="accent" loading={saving} disabled={unchanged} onPress={save} style={{ alignSelf: "flex-start" }} />
     </Card>
   );
 }

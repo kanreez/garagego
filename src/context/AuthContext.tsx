@@ -14,7 +14,7 @@ type AuthContextType = {
   logout: () => Promise<void>;
 };
 
-export type SignupInput = { firstName: string; lastName: string; email: string; password: string };
+export type SignupInput = { firstName: string; lastName: string; email: string; phone: string; phonePublic: boolean; password: string };
 // username: what the server picked from the name; needsConfirmation: check the inbox before logging in
 export type SignupResult = { username: string | null; needsConfirmation: boolean };
 
@@ -56,11 +56,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   // Through the server, which also picks a free username from the name
-  const signup = async ({ firstName, lastName, email, password }: SignupInput): Promise<SignupResult> => {
+  const signup = async ({ firstName, lastName, email, phone, phonePublic, password }: SignupInput): Promise<SignupResult> => {
     const res = await api.post<Partial<Tokens> & { username: string | null; needs_confirmation?: boolean }>("/api/auth/signup", {
       first_name: firstName,
       last_name: lastName,
       email,
+      phone,
+      public: phonePublic,
       password,
     });
     if (res.access_token && res.refresh_token) {
