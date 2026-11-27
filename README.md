@@ -1,99 +1,100 @@
 # GarageGo
 
-Rent a neighbour's garage by the hour, anywhere in Bulgaria. Say what you need in plain words
-("покрит гараж в Лозенец утре от 9 до 13 за джип"), book it, pay, and open the door from your phone.
+Наеми гараж на съсед за час или за ден, навсякъде в България. Кажи с думи какво ти трябва
+(„покрит гараж в Лозенец утре от 9 до 13 за джип“), резервирай, плати и отвори вратата от телефона.
 
-Live web version: **https://garagego.pages.dev**
+Работеща версия: **https://garagego.pages.dev**
 
-## What it does
+## Какво прави
 
-**Renters**
-- **Search in plain language**, Bulgarian or English. An AI turns the request into filters (city, Sofia district, time, car size, covered) and also reads each garage's title and description, so "гараж със зарядно" finds the one that mentions an EV charger.
-- **Book** by the hour or the day. The time picker starts at the current minute, so time someone just freed can be booked.
-- **Pay** through a mock checkout. No real money moves (test cards below).
-- **Open and close the garage door** from the app while the booking is active. An ESP32 on the door does the rest.
-- **Leave early** to free the rest of the time for others. There's no refund.
-- **Review** a stay with 1 to 5 stars and a comment.
+**Наематели**
+- **Търсене с думи**, на български или английски. Изкуственият интелект превръща заявката във филтри (град, квартал на София, час, размер на колата, покрит) и намира ключовите думи и на двата езика, така че „гараж със зарядно“ намира обявата, в която пише „EV charger“. Търсене по име на гараж става веднага, без ИИ.
+- **Резервация** за час или за ден. Изборът на час започва от текущата минута, така че току-що освободено време може да се запази.
+- **Плащане** през тестова каса. Не се движат истински пари (тестовите карти са по-долу).
+- **Отваряне и затваряне на вратата** от приложението, докато резервацията тече. Останалото го прави ESP32 на вратата.
+- **Тръгване по-рано**, за да се освободи останалото време за други. Без връщане на пари.
+- **Отзив** за престоя с 1 до 5 звезди и коментар.
 
-**Hosts**
-- **List a garage** in any of Bulgaria's 27 regional cities:
-  - type the address and tap **Find on map**, or tap the map;
-  - upload or take a photo;
-  - set the free hours and the prices.
-- **Hide** a listing for a while, or **delete** it for good. Deleting is refused while bookings are still running.
-- **See earnings** and **pair the door's device** using its key.
+**Хостове**
+- **Обявяване на гараж** във всеки от 27-те областни града:
+  - пишеш адреса и натискаш **Намери на картата**, или посочваш място на картата;
+  - качваш или снимаш снимка;
+  - задаваш свободните часове и цените.
+- **Скриване** на обява за известно време или **изтриване** завинаги. Изтриването не е позволено, докато има текущи резервации.
+- **Приходи** и **свързване на устройството** на вратата с неговия ключ.
 
-**Everyone**
-- Log in with a username or an email.
-- Change the username and the language in Settings. Bulgarian is the default.
+**Всички**
+- Вход с потребителско име или имейл. Име, написано на кирилица, се превръща в латиница.
+- Задължителен телефонен номер, публичен или личен. Личният се вижда само от наематели с платена резервация.
+- В Настройки: потребителско име, телефон и език. По подразбиране е на български.
 
-## How it fits together
+## Как е свързано
 
 ```
- Phone / browser (Expo app)
-        │  HTTPS, user's Supabase token
+ Телефон / браузър (Expo приложение)
+        │  HTTPS, с Supabase токена на потребителя
         ▼
- Express server (server/) ──► Supabase: auth, Postgres, Storage (garage photos)
+ Express сървър (server/) ──► Supabase: вход, Postgres, Storage (снимки на гаражи)
         │        │
-        │        ├──► AI search: Gemini Flash-Lite → Groq → Gemini / Claude / OpenAI (first that answers)
-        │        └──► OpenStreetMap Nominatim (address search, via one rate-limited queue)
+        │        ├──► Търсене с ИИ: Gemini Flash-Lite → Groq → Gemini / Claude / OpenAI (първият, който отговори)
+        │        └──► OpenStreetMap Nominatim (търсене на адреси, през една опашка с ограничение)
         ▲
-        │  polls every 300 ms with its device key
- ESP32 on the garage door (firmware/garage_bridge)
+        │  пита за команди няколко пъти в секунда, с ключа на устройството
+ ESP32 на гаражната врата (firmware/garage_bridge)
 ```
 
-The server is the only authority:
-- **Prices:** it sets the price; the app never sends an amount.
-- **Payments:** it decides whether a booking is paid.
-- **Door:** it only queues a door command for a renter whose paid booking covers right now.
-- **Device keys:** renters never see a garage's device key, and the phone never talks to the ESP32.
+Сървърът решава всичко важно:
+- **Цени:** той определя цената; приложението никога не изпраща сума.
+- **Плащания:** той решава дали резервацията е платена.
+- **Врата:** приема команда само от наемател, чиято платена резервация тече в момента.
+- **Ключове на устройствата:** наемателите никога не виждат ключа на гаража, а телефонът никога не говори директно с ESP32.
 
-**AI search safety:** the user's request and the hosts' listing text are both treated as untrusted data. They're cleaned, fenced off in the prompt, and checked against a strict schema. Off-topic requests get a fixed hint instead of an AI answer.
+**Безопасност на търсенето с ИИ:** заявката на потребителя и текстовете на обявите се третират като непроверени данни. Почистват се, отделят се в заявката към модела и отговорът се проверява по строга схема. Заявки, които не са за паркиране, получават фиксиран съвет вместо отговор от ИИ.
 
-## Project layout
+## Структура на проекта
 
 ```
-src/app/              Screens (Expo Router)
-  (auth)/             Log in, sign up
-  (tabs)/index.tsx    Find: AI search, list and map
-  (tabs)/bookings.tsx My bookings: door panel, tickets, leave early, reviews
-  (tabs)/profile.tsx  Profile
-  garage/[id].tsx     Garage page: details, reviews, time picker, pay
-  host/index.tsx      Your garages: hide, delete, earnings, device pairing
-  host/new.tsx        List or edit a garage: city, address search, map pin, photo
-  settings.tsx        Username and language
-src/components/       UI pieces (map/, CityPicker, PhotoField, DoorPanel, PaySheet, Stars...)
-src/i18n/             en.ts and bg.ts (every string in both), errors.ts (server messages)
-src/services/         API calls to the server
-server/               Express API: server.js (routes), garages.js (rules + AI prompts),
-                      repo.js (Supabase, or memory before the tables exist), geocode.js,
-                      photos.js, usernames.js, payments/ (mock provider, pricing)
-supabase/             SQL to run in the Supabase SQL editor
-firmware/             ESP32 door bridge (Arduino), runs in Wokwi or on a real board
+src/app/              Екрани (Expo Router)
+  (auth)/             Вход и регистрация
+  (tabs)/index.tsx    Търсене: ИИ, списък и карта
+  (tabs)/bookings.tsx Резервации: панел на вратата, билети, тръгване по-рано, отзиви
+  (tabs)/profile.tsx  Профил
+  garage/[id].tsx     Страница на гараж: данни, отзиви, избор на час, плащане
+  host/index.tsx      Твоите гаражи: скриване, изтриване, приходи, свързване на устройство
+  host/new.tsx        Обявяване или редакция: град, търсене на адрес, точка на картата, снимка
+  settings.tsx        Потребителско име, телефон и език
+src/components/       Части от интерфейса (map/, CityPicker, PhotoField, DoorPanel, PaySheet, Stars...)
+src/i18n/             en.ts и bg.ts (всеки текст на двата езика), errors.ts (съобщенията от сървъра)
+src/services/         Заявки към сървъра
+server/               Express API: server.js (маршрути), garages.js (правила, търсене),
+                      repo.js (Supabase или паметта, преди да има таблици), geocode.js,
+                      photos.js, usernames.js, phones.js, payments/ (тестова каса, цени)
+supabase/             SQL файлове за редактора на Supabase
+firmware/             Програмата за ESP32 на вратата (Arduino)
 ```
 
-## Setup
+## Инсталиране
 
-You need Node 22.13 or newer, a Supabase project, and at least one AI key (Anthropic, Gemini or OpenAI).
+Трябват Node 22.13 или по-нов, проект в Supabase и поне един ключ за ИИ (Gemini е безплатен).
 
-1. **Install** the dependencies:
+1. **Инсталирай** пакетите:
 
    ```bash
    npm install
    ```
 
-2. **App settings:** copy `.env.example` to `.env` in the project root. Fill in:
-   - the Supabase URL;
-   - the publishable (anon) key. Never use the secret key here.
+2. **Настройки на приложението:** копирай `.env.example` като `.env` в главната папка. Попълни:
+   - адреса на Supabase;
+   - публичния (anon) ключ. Никога не слагай тук тайния ключ.
 
-3. **Server settings:** copy `server/.env.example` to `server/.env`. Fill in:
-   - `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (the secret key);
-   - at least one of `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, `OPENAI_API_KEY`.
+3. **Настройки на сървъра:** копирай `server/.env.example` като `server/.env`. Попълни:
+   - `SUPABASE_URL` и `SUPABASE_SERVICE_ROLE_KEY` (тайният ключ);
+   - поне един от `GEMINI_API_KEY`, `GROQ_API_KEY`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`.
 
-   Share the secret values privately, never through a public place.
+   Тайните стойности се споделят лично, никога на публично място.
 
-4. **Database:** in Supabase, open the SQL editor and run these in order:
-   1. a `profiles` table, if your project doesn't have one yet:
+4. **База данни:** в Supabase отвори SQL редактора и пусни по ред:
+   1. таблица `profiles`, ако проектът още няма такава:
 
       ```sql
       create table if not exists public.profiles (
@@ -106,82 +107,77 @@ You need Node 22.13 or newer, a Supabase project, and at least one AI key (Anthr
       alter table public.profiles enable row level security;
       ```
 
-   2. `supabase/garages.sql`: garages, bookings, payments, door commands, and seven sample garages in Sofia;
+   2. `supabase/garages.sql`: гаражи, резервации, плащания, команди към вратата и седем примерни гаража в София;
    3. `supabase/reviews.sql`;
    4. `supabase/usernames.sql`;
-   5. `supabase/garage-visibility.sql`: hide, delete, leave early;
-   6. `supabase/cities.sql`: cities, plus sample garages in Plovdiv and Varna.
+   5. `supabase/garage-visibility.sql`: скриване, изтриване, тръгване по-рано;
+   6. `supabase/cities.sql`: градове и примерни гаражи в Пловдив и Варна.
 
-   **Notes:**
-   - Until the tables exist, the server runs on built-in sample data kept in memory, so the app works straight away.
-   - The photo bucket `garage-photos` is created by the server on the first upload.
+   **Бележки:**
+   - Докато таблиците ги няма, сървърът работи с вградени примерни данни в паметта, така че приложението тръгва веднага.
+   - Папката за снимки `garage-photos` се създава от сървъра при първото качване.
 
-## Run
+## Стартиране
 
-Two terminals, both in the project root:
+Два терминала, и двата в главната папка:
 
 ```bash
-npm run server        # API on port 3000
+npm run server        # API на порт 3000
 ```
 
 ```bash
-npx expo start -c     # the app: press w for web, or scan the QR code with Expo Go
+npx expo start -c     # приложението: натисни w за браузър или сканирай QR кода с Expo Go
 ```
 
-- **Phone:** a phone on the same Wi-Fi finds the server on your PC by itself. If Windows asks whether Node may use the network, allow it on private networks.
-- **After changing `.env`:** restart with `npx expo start -c`.
-- **After changing anything in `server/`:** restart `npm run server`.
-- **Adding packages:** use `npx expo install <package>`, so the versions match Expo SDK 58.
-- **One command (Windows):** `scripts/garagego.ps1 start` opens the server, the web app and two public tunnels in their own windows and writes the server tunnel's address into `.env`; `stop` closes them, `local` skips the tunnels, `urls` shows the addresses.
+- **Телефон:** телефон в същата Wi-Fi мрежа сам намира сървъра на компютъра. Ако Windows попита дали Node може да ползва мрежата, разреши го за частни мрежи.
+- **След промяна на `.env`:** рестартирай с `npx expo start -c`.
+- **След промяна в `server/`:** рестартирай `npm run server`.
+- **Нови пакети:** с `npx expo install <пакет>`, за да съвпадат версиите с Expo SDK 58.
+- **С една команда (Windows):** `scripts/garagego.ps1 start` отваря сървъра, приложението и два публични тунела в отделни прозорци и записва адреса на сървъра в `.env`; `stop` ги затваря, `local` е без тунели, `urls` показва адресите.
 
-## Try it
+## Пробвай
 
-- **Search:** try `гараж със зарядно`, `покрит гараж в Лозенец утре от 9 до 13 за джип`, `гараж в Пловдив утре` or `garage for a van with a roof box`.
-- **Pay:** with the demo wallet, or one of these test cards:
+- **Търсене:** `гараж със зарядно`, `покрит гараж в Лозенец утре от 9 до 13 за джип`, `гараж в Пловдив утре` или `garage for a van with a roof box`.
+- **Плащане:** с демо портфейла или с една от тестовите карти:
 
-  | Card | Result |
+  | Карта | Резултат |
   |---|---|
-  | `4242 4242 4242 4242` | paid |
-  | `4000 0000 0000 0002` | declined |
-  | `4000 0000 0000 9995` | insufficient funds |
-  | `4000 0000 0000 3220` | asks you to confirm in the "bank app" |
+  | `4242 4242 4242 4242` | платено |
+  | `4000 0000 0000 0002` | отказана |
+  | `4000 0000 0000 9995` | недостатъчна наличност |
+  | `4000 0000 0000 3220` | иска потвърждение в „банковото приложение“ |
 
-- **Door without hardware:**
+- **Врата без хардуер:**
 
   ```bash
   node server/fake-device.js
   ```
 
-  This pretends to be the ESP32 of the sample garage "Covered garage by Pirogov". Book that garage for now, pay, and tap **Open** in My bookings. Use `FAIL=1` to test the error state.
-- **Your own garage's door:** run `node server/fake-device.js <device key>`. The key is shown under **Pair a device** in Your garages.
+  Това се представя за ESP32 на примерния гараж „Covered garage by Pirogov“. Резервирай го за сега, плати и натисни **Отвори** в Резервации. С `FAIL=1` се пробва грешка.
+- **Вратата на твоя гараж:** `node server/fake-device.js <ключ на устройството>`. Ключът е под **Свържи устройство** в Твоите гаражи.
 
-## The door (ESP32)
+## Вратата (ESP32)
 
-`firmware/garage_bridge/garage_bridge.ino` polls `GET /api/device/commands` with its device key. When a command arrives, it clicks a relay wired to the opener's wall button, then reports back with `POST /api/device/ack`.
+`firmware/garage_bridge/garage_bridge.ino` пита `GET /api/device/commands` с ключа на устройството. Когато дойде команда, задейства реле, свързано към бутона на мотора на вратата, и потвърждава с `POST /api/device/ack`.
 
-- **In the Wokwi simulator:**
-  1. Run `cloudflared tunnel --url http://localhost:3000`.
-  2. Put the `https://….trycloudflare.com` address it prints in `SERVER_URL`.
-  3. Paste the sketch and `diagram.json` into Wokwi.
-- **On a real board:**
-  1. Put your 2.4 GHz Wi-Fi and `http://<server PC IP>:3000` (or the deployed URL) in the sketch.
-  2. Wire relay `IN` to GPIO 4, and the relay's COM/NO to the opener's button terminals.
-- **Demo key:** the sample garages use `dev-door-lagera-1` and `dev-door-krasno-2`.
+- **На платката:**
+  1. Попълни името и паролата на Wi-Fi мрежата (2,4 GHz), адреса на сървъра и ключовете на гаражите в скицата.
+  2. Свържи `IN` на релето към GPIO 4, а COM/NO на релето към клемите на бутона на вратата.
+- **Тестови ключове:** примерните гаражи ползват `dev-door-lagera-1` и `dev-door-krasno-2`.
 
-## Deploy
+## Публикуване
 
-- **Website:** Cloudflare Pages, `https://garagego.pages.dev`. Publish with `scripts/garagego.ps1 deploy`
-  (the first time: `deploy https://<backend>.onrender.com`). It builds the web app with that backend's
-  address baked in and uploads it with wrangler; the first run asks you to log in to Cloudflare.
-- **Backend:** Render, free tier, from `render.yaml` (Render → New → Blueprint → this repository).
-  Paste `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` and `GEMINI_API_KEY` from `server/.env` when Render asks.
-  Render redeploys on every push to the branch it watches. The free tier sleeps after ~15 minutes
-  without requests, so the first request after a pause takes about a minute.
-- **ESP32:** set `SERVER_URL` in the sketch to the Render address once; it doesn't change.
-- **One container instead:** the `Dockerfile` builds an image that serves the website and the API from
-  one address.
+- **Сайт:** Cloudflare Pages, `https://garagego.pages.dev`. Публикува се с `scripts/garagego.ps1 deploy`
+  (първия път: `deploy https://<сървър>.onrender.com`). Компилира приложението с адреса на сървъра
+  и го качва с wrangler; първия път пита за вход в Cloudflare.
+- **Сървър:** Render, безплатен план, от `render.yaml` (Render → New → Blueprint → това хранилище).
+  Постави `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` и `GEMINI_API_KEY` от `server/.env`, когато Render ги поиска.
+  След push се обновява с **Manual Deploy → Deploy latest commit**. Безплатният план „заспива“ след
+  около 15 минути без заявки, затова първата заявка след пауза отнема до минута.
+- **ESP32:** `SERVER_URL` в скицата се задава веднъж с адреса в Render; той не се променя.
+- **Един контейнер:** `Dockerfile` прави образ, който обслужва и сайта, и API-то от един адрес.
 
-## Checks
+## Проверки
 
 ```bash
 npx tsc --noEmit
@@ -191,10 +187,10 @@ npx tsc --noEmit
 npx expo lint
 ```
 
-## Tech
+## Технологии
 
-- **App:** Expo SDK 58, Expo Router, React Native 0.88, react-native-maps (phone) and Leaflet (web).
-- **Server:** Express 5, Supabase (auth, Postgres, Storage).
-- **AI:** Gemini 3.5 Flash-Lite (free), with Groq (free), Gemini, Claude and OpenAI as fallbacks. A search by a garage's name is matched locally, without AI.
-- **Address search:** OpenStreetMap Nominatim.
-- **Door:** an ESP32 running Arduino.
+- **Приложение:** Expo SDK 58, Expo Router, React Native 0.88, react-native-maps (телефон) и Leaflet (уеб).
+- **Сървър:** Express 5, Supabase (вход, Postgres, Storage).
+- **ИИ:** Gemini 3.5 Flash-Lite (безплатен), с Groq (безплатен), Gemini, Claude и OpenAI като резерва. Търсене по име на гараж става без ИИ.
+- **Търсене на адреси:** OpenStreetMap Nominatim.
+- **Врата:** ESP32 с Arduino.
