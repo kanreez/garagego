@@ -11,6 +11,7 @@ import { EmptyState, ErrorState, Loading } from "../../components/StateViews";
 import { notify } from "../../components/Toast";
 import { colors, radius, spacing, typography } from "../../constants/theme";
 import { useAsync } from "../../hooks/useAsync";
+import { setHasGarages } from "../../hooks/useHasGarages";
 import { useRefreshOnFocus } from "../../hooks/useRefreshOnFocus";
 import { t, tn, useT } from "../../i18n";
 import { deleteGarage, myGarages, setGarageHidden } from "../../services/garages";
@@ -40,6 +41,10 @@ export default function HostGarages() {
   }, [setData]);
 
   const garages = data ?? [];
+
+  useEffect(() => {
+    if (data) setHasGarages(data.length > 0);
+  }, [data]);
 
   return (
     <ScreenWrapper scroll refreshing={refreshing} onRefresh={refresh} style={styles.page}>

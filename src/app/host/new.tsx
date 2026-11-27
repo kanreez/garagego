@@ -17,6 +17,7 @@ import { notify } from "../../components/Toast";
 import { ACCESS_META, AREA_CENTERS, areaLabel, AREAS, cityByName, cityCenter, cityLabel, DEFAULT_CITY, SIZE_META } from "../../constants/garages";
 import { colors, radius, spacing, typography } from "../../constants/theme";
 import { useAsync } from "../../hooks/useAsync";
+import { setHasGarages } from "../../hooks/useHasGarages";
 import { t, useT } from "../../i18n";
 import { createGarage, getGarage, updateGarage } from "../../services/garages";
 import { GeoPlace, reverseGeocode, searchAddress } from "../../services/geo";
@@ -224,6 +225,7 @@ function GarageForm({ garage }: { garage?: Garage }) {
         notify(t("hostForm.saved"));
       } else {
         await createGarage(input);
+        setHasGarages(true);
         notify(access === "app" ? t("hostForm.listedPair") : t("hostForm.listed"));
       }
       goBack("/host");

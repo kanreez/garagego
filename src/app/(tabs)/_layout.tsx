@@ -1,10 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { router, Tabs } from "expo-router";
 import { ComponentProps } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Sidebar } from "../../components/Sidebar";
 import { colors, fonts, shadow } from "../../constants/theme";
+import { useHasGarages } from "../../hooks/useHasGarages";
 import { useIsWide } from "../../hooks/useIsWide";
 import { useT } from "../../i18n";
 
@@ -35,6 +36,7 @@ export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const wide = useIsWide();
   const { t } = useT();
+  const hasGarages = useHasGarages();
   return (
     <Tabs
       tabBar={wide ? (props) => <Sidebar {...props} /> : undefined}
@@ -67,6 +69,16 @@ export default function TabsLayout() {
     >
       <Tabs.Screen name="index" options={{ title: t("tabs.find"), tabBarIcon: ({ focused }) => <TabIcon name="search" focused={focused} /> }} />
       <Tabs.Screen name="bookings" options={{ title: t("tabs.bookings"), tabBarIcon: ({ focused }) => <TabIcon name="key" focused={focused} /> }} />
+      <Tabs.Screen
+        name="garages"
+        options={{ title: t("tabs.garages"), href: hasGarages ? undefined : null, tabBarIcon: ({ focused }) => <TabIcon name="home" focused={focused} /> }}
+        listeners={{
+          tabPress: (e) => {
+            e.preventDefault();
+            router.push("/host");
+          },
+        }}
+      />
       <Tabs.Screen name="profile" options={{ title: t("tabs.profile"), tabBarIcon: ({ focused }) => <TabIcon name="person" focused={focused} /> }} />
     </Tabs>
   );

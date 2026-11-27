@@ -2,6 +2,7 @@ export const en = {
   "app.tagline": "Find a garage. Book it. Open it from your phone.",
   "tabs.find": "Find",
   "tabs.bookings": "Bookings",
+  "tabs.garages": "Garages",
   "tabs.profile": "Profile",
   "sidebar.hostTitle": "Have a garage?",
   "sidebar.hostBody": "Rent it out while you don't need it. You set the price and the hours.",

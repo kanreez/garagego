@@ -4,6 +4,7 @@ export const bg: Record<keyof typeof en, string> = {
   "app.tagline": "Намери гараж. Резервирай. Отвори го от телефона.",
   "tabs.find": "Търси",
   "tabs.bookings": "Резервации",
+  "tabs.garages": "Гаражи",
   "tabs.profile": "Профил",
   "sidebar.hostTitle": "Имаш гараж?",
   "sidebar.hostBody": "Отдай го, докато не ти трябва. Ти определяш цената и часовете.",

@@ -4,16 +4,18 @@ import type { BottomTabBarProps } from "expo-router/tabs";
 import { ComponentProps } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors, radius, spacing, typography } from "../constants/theme";
+import { useHasGarages } from "../hooks/useHasGarages";
 import { useT } from "../i18n";
 import { BrandMark } from "./BrandMark";
 import { Button } from "./Button";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
 
-const ICONS: Record<string, string> = { index: "search", bookings: "key", profile: "person" };
+const ICONS: Record<string, string> = { index: "search", bookings: "key", garages: "home", profile: "person" };
 
 export function Sidebar({ state, descriptors, emitter, navigateToTab }: BottomTabBarProps) {
   const { t } = useT();
+  const hasGarages = useHasGarages();
   return (
     <View style={styles.bar}>
       <View style={styles.brand}>
@@ -22,6 +24,7 @@ export function Sidebar({ state, descriptors, emitter, navigateToTab }: BottomTa
 
       <View style={styles.nav} accessibilityRole="tablist">
         {state.routes.map((route, i) => {
+          if (route.name === "garages" && !hasGarages) return null;
           const focused = state.index === i;
           const { title } = descriptors[route.key].options;
           const icon = ICONS[route.name] ?? "ellipse";
@@ -52,11 +55,13 @@ export function Sidebar({ state, descriptors, emitter, navigateToTab }: BottomTa
         })}
       </View>
 
-      <View style={styles.host}>
-        <Text style={styles.hostTitle}>{t("sidebar.hostTitle")}</Text>
-        <Text style={styles.hostBody}>{t("sidebar.hostBody")}</Text>
-        <Button title={t("sidebar.hostCta")} icon="add" size="sm" variant="secondary" onPress={() => router.push("/host")} />
-      </View>
+      {hasGarages ? null : (
+        <View style={styles.host}>
+          <Text style={styles.hostTitle}>{t("sidebar.hostTitle")}</Text>
+          <Text style={styles.hostBody}>{t("sidebar.hostBody")}</Text>
+          <Button title={t("sidebar.hostCta")} icon="add" size="sm" variant="secondary" onPress={() => router.push("/host")} />
+        </View>
+      )}
     </View>
   );
 }
