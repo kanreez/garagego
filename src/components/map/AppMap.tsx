@@ -4,18 +4,14 @@ import MapView, { Marker } from "react-native-maps";
 import { colors, doorPaint, radius, typography } from "../../constants/theme";
 import { AppMapProps, DEFAULT_ZOOM } from "./types";
 
-// Phone map (react-native-maps: Apple Maps on iOS, Google Maps on Android, works in Expo Go).
-// The browser gets AppMap.web.tsx instead, since react-native-maps has no web support.
 export function AppMap({ center, zoom = DEFAULT_ZOOM, recenterKey, pins = [], selectedId, onSelectPin, picked, pickedPaint, onPick, fitToPins, interactive = true, style }: AppMapProps) {
   const ref = useRef<MapView>(null);
-  // Roughly the span a web zoom level shows, so both platforms frame the same area
   const delta = 360 / 2 ** zoom;
   const region = { latitude: center.latitude, longitude: center.longitude, latitudeDelta: delta, longitudeDelta: delta };
 
   const fitTo = fitToPins && pins.length > 1 ? pins : null;
   const fitKey = fitTo?.map((p) => `${p.latitude},${p.longitude}`).join("|") ?? "";
 
-  // Moves the map when `center` changes, or frames all pins with fitToPins
   const frame = () => {
     if (fitTo) {
       ref.current?.fitToCoordinates(
@@ -29,7 +25,6 @@ export function AppMap({ center, zoom = DEFAULT_ZOOM, recenterKey, pins = [], se
 
   useEffect(() => {
     frame();
-    // fitKey stands in for the pins array, which is new on every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [center.latitude, center.longitude, delta, fitKey, recenterKey]);
 
@@ -79,7 +74,6 @@ export function AppMap({ center, zoom = DEFAULT_ZOOM, recenterKey, pins = [], se
 
 const styles = StyleSheet.create({
   wrap: { overflow: "hidden", borderRadius: radius.lg, backgroundColor: colors.sand },
-  // Graphite price pill led by the garage's door paint; selected: ringed in that paint
   pill: {
     flexDirection: "row",
     alignItems: "center",

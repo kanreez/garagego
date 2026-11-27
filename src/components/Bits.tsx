@@ -1,24 +1,20 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ComponentProps } from "react";
 import { Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
-import { colors, doorPaints, radius, shadow, spacing, typography } from "../constants/theme";
-
-// Small shared pieces of the design system (DESIGN.md)
+import { colors, doorPaints, radius, spacing, typography } from "../constants/theme";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
 
 type IconTileProps = {
   icon: IconName;
-  size?: number; // 40–56
+  size?: number;
   bg?: string;
   color?: string;
   style?: StyleProp<ViewStyle>;
 };
 
-// Graphite takes light icons, ochre takes dark ones
 const ICON_ON: Record<string, string> = { [colors.accent]: colors.onAccent, [colors.cta]: colors.onCta };
 
-// Rounded-square tile holding an icon
 export function IconTile({ icon, size = 44, bg = colors.sand, color, style }: IconTileProps) {
   const fg = color ?? ICON_ON[bg] ?? colors.ink;
   return (
@@ -34,7 +30,6 @@ export function IconTile({ icon, size = 44, bg = colors.sand, color, style }: Ic
   );
 }
 
-// 44px round outlined button at the right end of a tappable row
 export function RowAction({ icon, label, onPress }: { icon: IconName; label: string; onPress?: () => void }) {
   if (!onPress) {
     return (
@@ -55,21 +50,6 @@ export function RowAction({ icon, label, onPress }: { icon: IconName; label: str
   );
 }
 
-// Red "do this now" block. Only for urgent / emergency.
-export function UrgentBanner({ text, style }: { text: string; style?: StyleProp<ViewStyle> }) {
-  return (
-    <View style={[styles.urgent, style]} accessibilityRole="alert">
-      <View style={styles.urgentTile}>
-        <Ionicons name="warning" size={22} color={colors.error} />
-      </View>
-      <View style={{ flex: 1, gap: 2 }}>
-        <Text style={styles.urgentText}>{text}</Text>
-      </View>
-    </View>
-  );
-}
-
-// Small pill: tinted fill or outlined in a colour
 export function Tag({
   label,
   color = colors.ink,
@@ -97,7 +77,6 @@ export function Tag({
   );
 }
 
-// Screen intro: big bold white headline with a short orange subline under it
 export function Headline({ title, subline, style }: { title: string; subline?: string; style?: StyleProp<ViewStyle> }) {
   return (
     <View style={[styles.headline, style]}>
@@ -109,7 +88,6 @@ export function Headline({ title, subline, style }: { title: string; subline?: s
   );
 }
 
-// The logo: one ochre garage door with a stencilled G, the row's door everybody recognises
 export function LogoTile({ size = 40 }: { size?: number }) {
   const ribs = Math.max(2, Math.floor((size - 12) / 6));
   return (
@@ -127,14 +105,12 @@ export function LogoTile({ size = 40 }: { size?: number }) {
   );
 }
 
-// Section title used between cards
 export function SectionTitle({ children, muted }: { children: string; muted?: boolean }) {
   return <Text style={[styles.section, muted && { color: colors.textMuted }]}>{children}</Text>;
 }
 
 const styles = StyleSheet.create({
   tile: { alignItems: "center", justifyContent: "center" },
-  // Outlined, not filled: a list repeats it on every row, so it must stay quieter than the prices
   rowAction: {
     width: 44,
     height: 44,
@@ -144,24 +120,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  urgent: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    backgroundColor: colors.error,
-    padding: spacing.md,
-    borderRadius: radius.lg,
-    ...shadow.float,
-  },
-  urgentTile: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: colors.white,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  urgentText: { ...typography.h3, color: colors.white },
   tag: {
     flexDirection: "row",
     alignItems: "center",

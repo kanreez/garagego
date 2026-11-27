@@ -4,11 +4,8 @@ import { colors, typography } from "../constants/theme";
 import { useT } from "../i18n";
 import { RatingSummary } from "../types/garage";
 
-// Stars are ink, not ochre: ochre stays reserved for opening the door and the forward action
-
 type StarsProps = { value: number; size?: number; color?: string };
 
-// Read-only: rounds to the nearest half star
 export function Stars({ value, size = 14, color = colors.ink }: StarsProps) {
   const { t } = useT();
   const halves = Math.round(value * 2);
@@ -26,7 +23,6 @@ export function Stars({ value, size = 14, color = colors.ink }: StarsProps) {
   );
 }
 
-// Average + count, e.g. "★ 4.5  2 reviews"; nothing when a garage has no reviews yet
 export function RatingLine({ rating, emptyText }: { rating?: RatingSummary; emptyText?: string }) {
   const { tn } = useT();
   if (!rating || !rating.count || rating.average == null) {
@@ -43,7 +39,6 @@ export function RatingLine({ rating, emptyText }: { rating?: RatingSummary; empt
   );
 }
 
-// Tap a star to rate. Each star is a 44pt target.
 export function StarPicker({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   const { t, tn } = useT();
   return (

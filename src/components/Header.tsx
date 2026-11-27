@@ -9,13 +9,13 @@ import { goBack } from "../utils/navigation";
 type Props = {
   title: string;
   subtitle?: string;
-  back?: boolean; // show a back arrow
-  backTo?: Href; // where the arrow goes when there's no previous screen (page opened directly)
-  right?: ReactNode; // e.g. an icon button or avatar
+  back?: boolean;
+  backTo?: Href;
+  right?: ReactNode;
 };
 
 export function Header({ title, subtitle, back, backTo = "/", right }: Props) {
-  useT(); // re-render in a new language
+  useT();
   return (
     <View style={styles.row}>
       <View style={styles.left}>
@@ -34,7 +34,7 @@ export function Header({ title, subtitle, back, backTo = "/", right }: Props) {
 
 type IconButtonProps = {
   icon: React.ComponentProps<typeof Ionicons>["name"];
-  label: string; // for screen readers
+  label: string;
   onPress: () => void;
   tone?: "plain" | "solid";
 };

@@ -14,12 +14,12 @@ import { Input } from "./Input";
 import { notify } from "./Toast";
 
 type Props = {
-  checkout: Checkout | null; // null = closed
-  title: string; // the garage
-  range: string; // "Tomorrow 09:00 – 13:00"
-  breakdown: string; // "4 h × €3 = €12"
+  checkout: Checkout | null;
+  title: string;
+  range: string;
+  breakdown: string;
   onPaid: (result: PayResult) => void;
-  onClose: () => void; // renter backed out: the caller frees the slot
+  onClose: () => void;
   onExpired: () => void;
 };
 
@@ -36,7 +36,6 @@ const formatExpiry = (s: string) => {
 const pad = (n: number) => String(n).padStart(2, "0");
 const formatLeft = (ms: number) => `${Math.floor(ms / 60000)}:${pad(Math.floor((ms % 60000) / 1000))}`;
 
-// Format checks only: the server decides whether the card works, and only the number is sent
 function cardErrors(card: string, expiry: string, cvc: string) {
   const errors: Record<string, string> = {};
   const n = digitsOf(card);
@@ -52,11 +51,8 @@ function cardErrors(card: string, expiry: string, cvc: string) {
   return errors;
 }
 
-// Checkout for a booking: card or demo wallet, a held-slot countdown, and a fake
-// "confirm in your bank app" step. The server decides the outcome; this only asks.
-// Render it with key={checkout?.booking_id} so each booking starts with an empty form.
 export function PaySheet({ checkout, title, range, breakdown, onPaid, onClose, onExpired }: Props) {
-  useT(); // re-render in a new language
+  useT();
   const wide = useIsWide();
   const [phase, setPhase] = useState<Phase>("idle");
   const [card, setCard] = useState("");
@@ -66,7 +62,6 @@ export function PaySheet({ checkout, title, range, breakdown, onPaid, onClose, o
   const [declined, setDeclined] = useState<string | null>(null);
   const [paidWith, setPaidWith] = useState("");
   const [now, setNow] = useState(() => Date.now());
-  // One key per attempt: the same card retried keeps its key, a different card gets a new one
   const attempt = useRef<{ key: string; source: string } | null>(null);
 
   const left = checkout ? new Date(checkout.expires_at).getTime() - now : 0;
@@ -94,7 +89,7 @@ export function PaySheet({ checkout, title, range, breakdown, onPaid, onClose, o
     if (result.status === "succeeded") {
       setPaidWith(result.method === "wallet" ? t("pay.demoWallet") : `${result.card_brand ?? t("pay.card")} •••• ${result.card_last4 ?? ""}`);
       setPhase("success");
-      setTimeout(() => onPaid(result), 900); // let the check mark land
+      setTimeout(() => onPaid(result), 900);
     } else if (result.status === "requires_action") {
       setPhase("action");
     } else {
@@ -128,7 +123,6 @@ export function PaySheet({ checkout, title, range, breakdown, onPaid, onClose, o
 
   const payWallet = () => run(() => confirmPayment(checkout.payment_id, { wallet: true, idempotency_key: keyFor("wallet") }));
 
-  // Approve in the "bank app": same attempt, so the same key
   const approve = () =>
     run(() => confirmPayment(checkout.payment_id, { action_confirmed: true, idempotency_key: attempt.current!.key }));
 

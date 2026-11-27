@@ -4,7 +4,7 @@ import { colors, fonts } from "../constants/theme";
 
 type Props = {
   uri?: string | null;
-  name?: string | null; // used for initials when there is no image
+  name?: string | null;
   size?: number;
 };
 

@@ -10,17 +10,15 @@ import { Button } from "./Button";
 import { notify } from "./Toast";
 
 type Props = {
-  value: string | null; // the photo's URL
+  value: string | null;
   onChange: (url: string | null) => void;
-  onBusy?: (busy: boolean) => void; // while uploading, so the form can wait before saving
+  onBusy?: (busy: boolean) => void;
 };
 
-// The garage's photo: choose one from the phone (or take one) and it uploads straight away;
-// the listing keeps its URL. A browser has no camera button: its file picker covers it.
 export function PhotoField({ value, onChange, onBusy }: Props) {
   const { t } = useT();
   const [uploading, setUploading] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null); // the local file, shown while it uploads
+  const [preview, setPreview] = useState<string | null>(null);
 
   const add = async (source: "library" | "camera") => {
     try {

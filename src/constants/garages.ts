@@ -1,8 +1,6 @@
 import { getLang, t } from "../i18n";
 import { Access, Garage, GarageSize } from "../types/garage";
 
-// The 27 regional capitals, same as CITIES in server/garages.js. `name` (English) is what's stored
-// and sent; cityLabel() shows it in the app language. Centres frame the map at city zoom.
 export type City = { name: string; bg: string; latitude: number; longitude: number };
 export const CITIES: City[] = [
   { name: "Sofia", bg: "София", latitude: 42.6977, longitude: 23.3219 },
@@ -34,7 +32,6 @@ export const CITIES: City[] = [
   { name: "Vidin", bg: "Видин", latitude: 43.9962, longitude: 22.8679 },
 ];
 export const DEFAULT_CITY = "Sofia";
-// Listed first in the city picker; the rest follow alphabetically
 export const BIG_CITIES = ["Sofia", "Plovdiv", "Varna", "Burgas"];
 
 export const cityByName = (name: string | null | undefined) => CITIES.find((c) => c.name === name) ?? null;
@@ -48,8 +45,6 @@ export const cityCenter = (name: string | null | undefined) => {
   return { latitude: city.latitude, longitude: city.longitude };
 };
 
-// Where a garage is, for lists and headers: "Лагера" in Sofia, "Център, Пловдив" elsewhere.
-// A district left blank is stored as the city's name, so it isn't shown twice.
 export function placeLabel(g: Pick<Garage, "area" | "city">) {
   const city = g.city ?? DEFAULT_CITY;
   if (city === DEFAULT_CITY) return areaLabel(g.area);
@@ -57,14 +52,11 @@ export function placeLabel(g: Pick<Garage, "area" | "city">) {
   return `${areaLabel(g.area)}, ${cityLabel(city)}`;
 }
 
-// Same area names as AREAS in server/garages.js (the AI search picks one of these). All in Sofia.
 export const AREAS = ["Lagera", "Krasno Selo", "Lozenets", "Center", "Mladost"] as const;
 
-// The names stay as data (the server and the AI search use them); this is how they're shown
 const AREA_KEYS = { Lagera: "area.lagera", "Krasno Selo": "area.krasnoSelo", Lozenets: "area.lozenets", Center: "area.center", Mladost: "area.mladost" } as const;
 export const areaLabel = (area: string) => (area in AREA_KEYS ? t(AREA_KEYS[area as (typeof AREAS)[number]]) : area);
 
-// Centre points, same as AREAS in server/garages.js: where the map opens before there's a pin
 export const AREA_CENTERS: Record<(typeof AREAS)[number], { latitude: number; longitude: number }> = {
   Lagera: { latitude: 42.6866, longitude: 23.3005 },
   "Krasno Selo": { latitude: 42.6809, longitude: 23.2895 },
@@ -73,7 +65,6 @@ export const AREA_CENTERS: Record<(typeof AREAS)[number], { latitude: number; lo
   Mladost: { latitude: 42.6494, longitude: 23.3792 },
 };
 
-// Getters, so SIZE_META.small.label is always in the current language (read it during render)
 const sizeMeta = (key: "small" | "medium" | "large") => ({
   get label() { return t(`size.${key}` as const); },
   get hint() { return t(`size.${key}.hint` as const); },
@@ -94,6 +85,4 @@ export const ACCESS_META: Record<Access, { label: string; hint: string }> = {
   manual: accessMeta("manual"),
 };
 
-// Tappable examples under the Ask box, in the app's language: good for the demo, and they
-// show what the AI understands. Call during render.
 export const exampleQueries = () => [t("examples.1"), t("examples.2"), t("examples.3")];

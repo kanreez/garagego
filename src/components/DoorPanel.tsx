@@ -3,27 +3,24 @@ import { useEffect, useRef, useState } from "react";
 import { AccessibilityInfo, Animated, Easing, Platform, StyleSheet, Text, View } from "react-native";
 import { colors, doorPaints, radius, spacing, typography } from "../constants/theme";
 
-// What the physical door is doing, derived from the door command's status on the bookings screen
 export type DoorVisual = "closed" | "opening" | "open" | "closing" | "error";
 
 type Props = {
   visual: DoorVisual;
-  // Where the door rests in the error state: it drops back to where it was before the command
   restingOpen: boolean;
   caption: string;
-  paint?: string; // the garage's door colour (doorPaint), so it's the same door as in the lists
-  stencil?: string; // the size letter painted on the door
+  paint?: string;
+  stencil?: string;
 };
 
 const SLATS = 7;
 const DOOR_HEIGHT = 168;
-const QUEUED_LIFT = 6; // "Talking to the door…": lifts a few pixels and holds
-const RAIL = 14; // when open, the door's painted bottom rail stays visible under the lintel
+const QUEUED_LIFT = 6;
+const RAIL = 14;
 const ROLL_MS = 700;
 
-// The roller garage door on the active booking: shows the real state of the physical door
 export function DoorPanel({ visual, restingOpen, caption, paint = doorPaints[0], stencil }: Props) {
-  const [lift] = useState(() => new Animated.Value(restingOpen ? DOOR_HEIGHT - RAIL : 0)); // px the door is raised
+  const [lift] = useState(() => new Animated.Value(restingOpen ? DOOR_HEIGHT - RAIL : 0));
   const [shimmer] = useState(() => new Animated.Value(0));
   const [shake] = useState(() => new Animated.Value(0));
   const [fade] = useState(() => new Animated.Value(1));
@@ -36,7 +33,6 @@ export function DoorPanel({ visual, restingOpen, caption, paint = doorPaints[0],
     return () => sub.remove();
   }, []);
 
-  // Move the door to the position for this state
   useEffect(() => {
     const target =
       visual === "open" ? DOOR_HEIGHT - RAIL
@@ -46,7 +42,6 @@ export function DoorPanel({ visual, restingOpen, caption, paint = doorPaints[0],
       : 0;
 
     if (reduceMotion) {
-      // Crossfade between states instead of moving the door
       Animated.sequence([
         Animated.timing(fade, { toValue: 0, duration: 120, useNativeDriver: true }),
         Animated.timing(lift, { toValue: target, duration: 0, useNativeDriver: true }),
@@ -63,7 +58,6 @@ export function DoorPanel({ visual, restingOpen, caption, paint = doorPaints[0],
       useNativeDriver: true,
     });
     if (visual === "error") {
-      // Drops back, then a short shake
       Animated.sequence([
         move,
         Animated.sequence([10, -8, 6, -3, 0].map((x) => Animated.timing(shake, { toValue: x, duration: 55, useNativeDriver: true }))),
@@ -73,7 +67,6 @@ export function DoorPanel({ visual, restingOpen, caption, paint = doorPaints[0],
     }
   }, [visual, restingOpen, reduceMotion, lift, shake, fade]);
 
-  // Slats shimmer while the command is on its way, so up to ~15 s of waiting still looks alive
   const waiting = visual === "opening" || visual === "closing";
   useEffect(() => {
     if (!waiting || reduceMotion) {
@@ -90,7 +83,6 @@ export function DoorPanel({ visual, restingOpen, caption, paint = doorPaints[0],
     return () => loop.stop();
   }, [waiting, reduceMotion, shimmer]);
 
-  // A tap you can feel when the door confirms, phones only
   useEffect(() => {
     const was = previous.current;
     previous.current = visual;
@@ -105,14 +97,12 @@ export function DoorPanel({ visual, restingOpen, caption, paint = doorPaints[0],
   return (
     <View style={styles.wrap}>
       <Animated.View style={[styles.frame, { opacity: fade, transform: [{ translateX: shake }] }]}>
-        {/* The bay behind the door, lit once it's open */}
         <View style={styles.bay}>
           <Animated.View
             style={[styles.floorLine, { opacity: lift.interpolate({ inputRange: [0, DOOR_HEIGHT * 0.6, DOOR_HEIGHT - RAIL], outputRange: [0, 0.4, 1] }) }]}
           />
         </View>
 
-        {/* The door: slats rolling up into the top of the frame */}
         <Animated.View style={[styles.door, { transform: [{ translateY: Animated.multiply(lift, -1) }] }]}>
           {Array.from({ length: SLATS }, (_, i) => (
             <View key={i} style={[styles.slat, { backgroundColor: paint }]}>
@@ -137,14 +127,14 @@ export function DoorPanel({ visual, restingOpen, caption, paint = doorPaints[0],
 }
 
 const SLAT_GAP = 2;
-const BAY = "#2B2F33"; // the dark garage behind the door (a material, not a theme colour)
+const BAY = "#2B2F33";
 const SLAT_HEIGHT = (DOOR_HEIGHT - SLAT_GAP * (SLATS - 1)) / SLATS;
 
 const styles = StyleSheet.create({
   wrap: { gap: spacing.sm },
   frame: {
     height: DOOR_HEIGHT + 10,
-    paddingTop: 10, // the lintel the door rolls into
+    paddingTop: 10,
     paddingHorizontal: 8,
     borderRadius: radius.md,
     borderWidth: 2,
@@ -155,11 +145,9 @@ const styles = StyleSheet.create({
   },
   lintel: { position: "absolute", top: 0, left: 0, right: 0, height: 10, backgroundColor: colors.ink },
   bay: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, justifyContent: "flex-end", paddingHorizontal: 18, paddingBottom: 14 },
-  // The painted ochre line on the bay floor, lit once the door is up
   floorLine: { height: 3, borderRadius: 2, backgroundColor: colors.cta, boxShadow: "0px 6px 12px rgba(226, 162, 58, 0.45)" },
   door: { height: DOOR_HEIGHT, gap: SLAT_GAP },
   slat: { height: SLAT_HEIGHT, borderRadius: 1, overflow: "hidden" },
-  // Each slat's top edge catches the light
   slatShine: { height: 2, backgroundColor: colors.white },
   stencil: { ...typography.stencil, position: "absolute", top: 40, alignSelf: "center", fontSize: 64, lineHeight: 76, color: colors.white, includeFontPadding: false },
   handle: { position: "absolute", bottom: 8, alignSelf: "center", width: 44, height: 4, borderRadius: 2, backgroundColor: "rgba(0, 0, 0, 0.3)" },

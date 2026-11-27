@@ -1,9 +1,3 @@
-// Stand-in for the ESP32 so the app team can test the Open flow before the hardware is ready.
-// It speaks exactly the shared contract: poll GET /api/device/commands, then POST /api/device/ack.
-//
-//   node server/fake-device.js                      uses the first demo key
-//   node server/fake-device.js <device_key> [url]   any garage's key (shown on the host screen)
-//   FAIL=1 node server/fake-device.js               acks "error" instead, to test the app's error state
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
 
@@ -20,7 +14,7 @@ async function tick() {
     if (!body.command_id) return;
 
     console.log(`${new Date().toLocaleTimeString()} got "${body.action}" (${body.command_id}), clicking the relay...`);
-    await new Promise((r) => setTimeout(r, 500)); // the ESP32 holds the relay for ~0.5 s
+    await new Promise((r) => setTimeout(r, 500));
     const ack = await fetch(`${SERVER}/api/device/ack`, {
       method: "POST",
       headers,

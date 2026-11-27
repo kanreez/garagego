@@ -24,12 +24,11 @@ import { Access, AvailabilityWindow, Garage, GarageInput, GarageSize } from "../
 import { Coords, distanceKm } from "../../utils/location";
 import { goBack } from "../../utils/navigation";
 
-const CITY_ZOOM = 13; // the whole city
-const DISTRICT_ZOOM = 15; // a Sofia district
-const STREET_ZOOM = 17; // a found address or your own location
-const FAR_KM = 30; // a pin further than this from the city's centre gets a warning
+const CITY_ZOOM = 13;
+const DISTRICT_ZOOM = 15;
+const STREET_ZOOM = 17;
+const FAR_KM = 30;
 
-// Built during render, so the labels follow the app language
 const areaOptions = () => AREAS.map((a) => ({ value: a, label: areaLabel(a) }));
 const sizeOptions = () => (Object.keys(SIZE_META) as GarageSize[]).map((s) => ({ value: s, label: `${SIZE_META[s].label}, ${SIZE_META[s].hint.toLowerCase()}` }));
 const coverOptions = () => [
@@ -43,7 +42,6 @@ const toNumber = (s: string) => Number(s.replace(",", "."));
 type Area = (typeof AREAS)[number];
 const isArea = (a: string): a is Area => (AREAS as readonly string[]).includes(a);
 
-// Host side: list a garage, or edit one with ?id=. No photo upload, only an optional image link.
 export default function GarageFormScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   useT();
@@ -69,12 +67,10 @@ function GarageForm({ garage }: { garage?: Garage }) {
   const [title, setTitle] = useState(garage?.title ?? "");
   const [city, setCity] = useState(garage?.city && cityByName(garage.city) ? garage.city : DEFAULT_CITY);
   const inSofia = city === DEFAULT_CITY;
-  // Sofia: one of the five known districts. Elsewhere: free text, optional (stored as the city if blank).
   const [area, setArea] = useState<Area>(garage && isArea(garage.area) ? garage.area : AREAS[0]);
   const [district, setDistrict] = useState(garage && garage.city && garage.city !== DEFAULT_CITY && garage.area !== garage.city ? garage.area : "");
   const [address, setAddress] = useState(garage?.address ?? "");
   const [coords, setCoords] = useState<Coords | null>(pinOf(garage));
-  // Where the map looks: the garage's pin, else the city (Sofia: the chosen district)
   const [focus, setFocus] = useState<MapFocus>(() => {
     const pin = pinOf(garage);
     if (pin) return { at: pin, zoom: STREET_ZOOM, id: 0 };
@@ -85,9 +81,8 @@ function GarageForm({ garage }: { garage?: Garage }) {
   const [geoNote, setGeoNote] = useState<"notFound" | "unavailable" | null>(null);
   const [finding, setFinding] = useState(false);
   const [whereTouched, setWhereTouched] = useState(false);
-  // What the lookups last filled in, so a later pin move may replace it but never the host's own text
   const autoFilled = useRef({ address: "", district: "" });
-  const lookup = useRef(0); // only the latest reverse lookup may fill the fields
+  const lookup = useRef(0);
   const [size, setSize] = useState<GarageSize>(garage?.size ?? "medium");
   const [cover, setCover] = useState<"covered" | "open">(garage && !garage.covered ? "open" : "covered");
   const [priceHour, setPriceHour] = useState(garage ? String(garage.price_hour) : "");
@@ -102,7 +97,6 @@ function GarageForm({ garage }: { garage?: Garage }) {
 
   const moveMap = (at: Coords, zoom: number) => setFocus((f) => ({ at, zoom, id: f.id + 1 }));
 
-  // Fill Address / District from a lookup, unless the host typed their own
   const fillFrom = (place: GeoPlace) => {
     if (place.address) {
       const next = place.address;
@@ -116,7 +110,6 @@ function GarageForm({ garage }: { garage?: Garage }) {
     }
   };
 
-  // A pin placed by a tap, a drag or "Use my location": look up the street there
   const placePin = async (at: Coords | null, fromGps = false) => {
     setWhereTouched(true);
     setCoords(at);
@@ -130,13 +123,11 @@ function GarageForm({ garage }: { garage?: Garage }) {
       if (!result || ticket !== lookup.current) return;
       setPinLabel(result.label);
       fillFrom(result);
-      // GPS put the pin in another known city: switch to it
       if (fromGps && result.city && result.city !== city && cityByName(result.city)) {
         setCity(result.city);
         notify(t("hostForm.citySet", { city: cityLabel(result.city) }));
       }
     } catch {
-      // No street name: the pin itself is what matters
     }
   };
 
@@ -149,7 +140,6 @@ function GarageForm({ garage }: { garage?: Garage }) {
     if (district === autoFilled.current.district) setDistrict("");
     const center = cityCenter(name);
     moveMap(center, CITY_ZOOM);
-    // A pin only stays if it's plausibly in the new city
     if (coords && distanceKm(coords, center) > FAR_KM) {
       lookup.current++;
       setCoords(null);
@@ -177,7 +167,6 @@ function GarageForm({ garage }: { garage?: Garage }) {
     }
   };
 
-  // "Find on map": one lookup per tap (OpenStreetMap doesn't allow search-as-you-type)
   const find = async () => {
     const q = address.trim();
     if (q.length < 3 || finding) return;
@@ -202,7 +191,6 @@ function GarageForm({ garage }: { garage?: Garage }) {
   const validate = () => {
     const next: Record<string, string> = {};
     if (!title.trim()) next.title = t("hostForm.errTitle");
-    // New listings need a pin; an old one without a pin only once the host edits where it is
     if (!coords && (!garage || whereTouched)) next.coords = t("hostForm.errPin");
     if (!(toNumber(priceHour) > 0)) next.priceHour = t("hostForm.errPriceHour");
     if (!(toNumber(priceDay) > 0)) next.priceDay = t("hostForm.errPriceDay");
@@ -218,7 +206,7 @@ function GarageForm({ garage }: { garage?: Garage }) {
       const input: GarageInput = {
         title: title.trim(),
         city,
-        area: inSofia ? area : district.trim(), // blank: the server uses the city's name
+        area: inSofia ? area : district.trim(),
         address: address.trim() || null,
         latitude: coords?.latitude ?? null,
         longitude: coords?.longitude ?? null,

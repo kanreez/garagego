@@ -19,7 +19,6 @@ type Props = {
   padded?: boolean;
   style?: StyleProp<ViewStyle>;
   edges?: Edge[];
-  // Pull-to-refresh (only with scroll)
   refreshing?: boolean;
   onRefresh?: () => void;
 };
@@ -34,7 +33,6 @@ export function ScreenWrapper({
   onRefresh,
 }: Props) {
   const wide = useIsWide();
-  // PC: centred column with roomier padding; no floating tab bar to clear (the sidebar is beside)
   const padding = padded ? (wide ? styles.paddedWide : styles.padded) : null;
   const widthCap = wide ? styles.wide : null;
 
@@ -68,11 +66,9 @@ export function ScreenWrapper({
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   flex: { flex: 1 },
-  // Clears the floating tab bar
   scrollContent: { flexGrow: 1, paddingBottom: 120 },
   scrollContentWide: { paddingBottom: spacing.xxl },
   padded: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg },
   paddedWide: { paddingHorizontal: spacing.xxl, paddingTop: spacing.xl },
-  // Screens can narrow this further with their own maxWidth in `style`
   wide: { width: "100%", maxWidth: 1160, alignSelf: "center" },
 });

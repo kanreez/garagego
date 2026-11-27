@@ -10,7 +10,6 @@ import { useT } from "../../i18n";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
 
-// Active tab gets an orange pill behind a filled dark icon
 function TabIcon({ name, focused }: { name: string; focused: boolean }) {
   return (
     <View
@@ -38,21 +37,18 @@ export default function TabsLayout() {
   const { t } = useT();
   return (
     <Tabs
-      // PC: a sidebar on the left instead of the floating bar
       tabBar={wide ? (props) => <Sidebar {...props} /> : undefined}
       screenOptions={{
         ...(wide ? { tabBarPosition: "left" as const } : null),
         headerShown: false,
         tabBarActiveTintColor: colors.ink,
         tabBarInactiveTintColor: colors.textMuted,
-        // Floating pill; ScreenWrapper pads scroll content so nothing hides behind it
         tabBarStyle: {
           position: "absolute",
           left: 0,
           right: 0,
           bottom: insets.bottom + 12,
           marginHorizontal: 16,
-          // 80 tall: each tab keeps 5px padding, so this leaves room for the 32px pill + the 16px label
           height: 80,
           paddingTop: 8,
           paddingBottom: 8,

@@ -4,7 +4,6 @@ import { StyleSheet, Text, View } from "react-native";
 import { colors, spacing, typography } from "../constants/theme";
 import { useT } from "../i18n";
 
-// The renter flow at a glance: 1 Find → 2 Book → 3 Open
 export function StepTracker({ active, steps: custom }: { active: number; steps?: string[] }) {
   const { t } = useT();
   const steps = custom ?? [t("steps.find"), t("steps.book"), t("steps.open")];
@@ -38,7 +37,6 @@ export function StepTracker({ active, steps: custom }: { active: number; steps?:
 }
 
 const styles = StyleSheet.create({
-  // Quieter than the content: small dots, caption labels, hairline connectors
   row: { flexDirection: "row", alignItems: "center", marginBottom: spacing.lg },
   step: { flexDirection: "row", alignItems: "center", gap: 6 },
   dot: {

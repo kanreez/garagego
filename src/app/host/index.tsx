@@ -19,19 +19,17 @@ import { Earnings, Garage } from "../../types/garage";
 import { summarizeAvailability } from "../../utils/availability";
 import { formatCents, formatDuration } from "../../utils/booking";
 
-const ONLINE_MS = 10000; // the ESP32 polls every second, so 10 s of silence means it's offline
-const PLATFORM_FEE_RATE = 0.15; // same as server/payments/pricing.js; display only
+const ONLINE_MS = 10000;
+const PLATFORM_FEE_RATE = 0.15;
 
-// Host side: your listed garages, and the device key to flash onto each garage's ESP32
 export default function HostGarages() {
-  useT(); // re-render in a new language
+  useT();
   const { data, loading, refreshing, error, reload, refresh, setData } = useAsync(myGarages);
   const earnings = useAsync(hostEarnings);
 
   useRefreshOnFocus(refresh);
   useRefreshOnFocus(earnings.refresh);
 
-  // Refresh "device online" while the host is pairing; `now` moves with it for "seen … ago"
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = setInterval(() => {
@@ -73,8 +71,6 @@ export default function HostGarages() {
   );
 }
 
-// Hide takes the garage off search (bookings already made keep working); Delete is for good,
-// after a confirm. The server refuses Delete while bookings haven't ended.
 function ListingActions({ garage, onChanged, onDeleted }: { garage: Garage; onChanged: (g: Garage) => void; onDeleted: () => void }) {
   useT();
   const [busy, setBusy] = useState<"hide" | "delete" | null>(null);
@@ -141,7 +137,6 @@ function ListingActions({ garage, onChanged, onDeleted }: { garage: Garage; onCh
   );
 }
 
-// What the host has earned: paid bookings after the platform fee, refunds excluded
 function EarningsCard({ earnings }: { earnings: Earnings }) {
   useT();
   const count = earnings.bookings.length;
@@ -161,7 +156,6 @@ function EarningsCard({ earnings }: { earnings: Earnings }) {
   );
 }
 
-// "Pair a device": the key to flash onto the ESP32, and whether it has checked in
 function PairDevice({ garage, now }: { garage: Garage; now: number }) {
   useT();
   const seen = garage.device_last_seen ? now - new Date(garage.device_last_seen).getTime() : null;

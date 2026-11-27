@@ -3,7 +3,6 @@ import { APP_NAME } from "../constants/app";
 import { colors, fonts, typography } from "../constants/theme";
 import { LogoTile } from "./Bits";
 
-// App logo + name. Swap the icon for a real logo on the day.
 export function BrandMark({ size = 40 }: { size?: number }) {
   return (
     <View style={styles.row}>

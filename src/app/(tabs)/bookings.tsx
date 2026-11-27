@@ -24,26 +24,22 @@ import { Booking, DoorAction } from "../../types/garage";
 import { formatCents, formatDay, formatDuration, formatTime } from "../../utils/booking";
 
 const POLL_MS = 1000;
-const GIVE_UP_MS = 30000; // the server already fails a command after 20 s; this is a safety net
+const GIVE_UP_MS = 30000;
 
-// Screen 3: the active booking with the Open button, then upcoming and past bookings
 export default function Bookings() {
-  useT(); // re-render in a new language
+  useT();
   const { data, loading, refreshing, error, reload, refresh } = useAsync(myBookings);
   const [now, setNow] = useState(() => new Date());
 
   useRefreshOnFocus(refresh);
 
-  // Keeps "time left" and which booking is active up to date
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 15000);
     return () => clearInterval(t);
   }, []);
 
-  // Most recently booked first, inside each section
   const bookings = [...(data ?? [])].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   const closed = (b: Booking) => b.status === "cancelled" || b.status === "expired";
-  // Only a paid booking is active: that's the one the door opens for
   const isActive = (b: Booking) => b.status === "paid" && new Date(b.starts_at) <= now && new Date(b.ends_at) > now;
   const active = bookings.filter(isActive);
   const upcoming = bookings.filter((b) => !closed(b) && !isActive(b) && new Date(b.ends_at) > now);
@@ -109,14 +105,13 @@ function ActiveBooking({ booking, now, onChanged }: { booking: Booking; now: Dat
   useT();
   const g = booking.garage;
   const [door, setDoor] = useState<Door>({ phase: "idle" });
-  // Whether the last command that went through opened the door, so the button offers the other one
   const [isOpen, setIsOpen] = useState(false);
   const alive = useRef(true);
 
   useEffect(() => {
     alive.current = true;
     return () => {
-      alive.current = false; // stop polling when the screen goes away
+      alive.current = false;
     };
   }, []);
 
@@ -150,7 +145,6 @@ function ActiveBooking({ booking, now, onChanged }: { booking: Booking; now: Dat
   const app = g?.access === "app";
   const next: DoorAction = isOpen ? "close" : "open";
 
-  // The door panel shows the physical door, derived from the command's status
   const visual: DoorVisual =
     door.phase === "busy" ? (door.action === "open" ? "opening" : "closing")
     : door.phase === "done" ? (door.action === "open" ? "open" : "closed")
@@ -180,7 +174,6 @@ function ActiveBooking({ booking, now, onChanged }: { booking: Booking; now: Dat
           <Button
             title={door.phase === "busy" ? busyLabel(door.action) : door.phase === "error" ? t("common.tryAgain") : next === "open" ? t("door.open") : t("door.close")}
             icon={next === "open" ? "lock-open" : "lock-closed"}
-            // Ochre always means "open the door"; closing is the graphite button
             variant={next === "open" ? "accent" : "primary"}
             loading={door.phase === "busy"}
             onPress={() => send(next)}
@@ -204,7 +197,6 @@ function ActiveBooking({ booking, now, onChanged }: { booking: Booking; now: Dat
   );
 }
 
-// Ends the booking now so the rest of the time frees up for others. No refund.
 function LeaveEarly({ booking, doorOpen, onLeft }: { booking: Booking; doorOpen: boolean; onLeft: () => void }) {
   useT();
   const [confirming, setConfirming] = useState(false);
@@ -240,7 +232,6 @@ function LeaveEarly({ booking, doorOpen, onLeft }: { booking: Booking; doorOpen:
   );
 }
 
-// Same verb through the flow: Open -> Opening… -> Opened 02:37
 const busyLabel = (a: DoorAction) => (a === "open" ? t("door.opening") : t("door.closing"));
 const doneLabel = (a: DoorAction, at: Date) => t(a === "open" ? "door.openedAt" : "door.closedAt", { time: formatTime(at) });
 
@@ -253,7 +244,6 @@ const paidWith = (b: Booking) =>
       ? `${b.payment.card_brand ?? t("pay.card")} •••• ${b.payment.card_last4}`
       : t("pay.card");
 
-// Status chip for a booking row: Paid / Refunded / Cancelled / Expired / Not paid
 function statusTag(b: Booking): { label: string; bg: string; color: string } {
   if (b.status === "paid") return { label: t("status.paid"), bg: colors.successSoft, color: colors.success };
   if (b.status === "cancelled" && b.payment?.status === "refunded") return { label: t("status.refunded"), bg: colors.accentSoft, color: colors.accentDeep };
@@ -271,7 +261,6 @@ function BookingRow({ booking, now, note, muted, onChanged, onReviewed }: RowPro
   const [cancelling, setCancelling] = useState(false);
   const tag = statusTag(booking);
   const amount = amountOf(booking);
-  // Paid: cancel (and refund) only before it starts. Unpaid: cancel any time to free the slot.
   const canCancel =
     !!onChanged && (booking.status === "pending_payment" || (booking.status === "paid" && new Date(booking.starts_at) > now));
 
@@ -293,7 +282,6 @@ function BookingRow({ booking, now, note, muted, onChanged, onReviewed }: RowPro
   const outAt = new Date(booking.ends_at);
   const shown = note ?? (booking.left_early_at ? t("bookings.leftEarly", { time: formatTime(new Date(booking.left_early_at)) }) : undefined);
 
-  // A parking ticket: In and Out times on top, a tear line, then what it is and what it cost
   return (
     <View style={styles.ticket}>
       <View style={[styles.times, muted && styles.dim]}>
@@ -350,7 +338,6 @@ function TicketTime({ label, at }: { label: string; at: Date }) {
   );
 }
 
-// The tear line: punched holes in the ground colour, with a notch cut into each edge
 const HOLES = 14;
 function Perforation() {
   return (

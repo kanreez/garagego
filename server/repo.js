@@ -1,12 +1,7 @@
-// Data access for garages, bookings and door commands.
-// Uses the Supabase tables from supabase/garages.sql when they exist, otherwise an in-memory
-// store (seeded below) so the demo works before the database is set up. Memory is lost on restart.
 const crypto = require("crypto");
 
 const newDeviceKey = () => crypto.randomBytes(16).toString("hex");
 
-// Dev-only keys for the two seeded "app" garages, so an ESP32 can be flashed once and keep
-// working across server restarts. Real garages get a random key from newDeviceKey().
 const SEED_KEYS = {
   g1: process.env.DEMO_DEVICE_KEY_1 || "dev-door-lagera-1",
   g2: process.env.DEMO_DEVICE_KEY_2 || "dev-door-krasno-2",
@@ -43,7 +38,6 @@ const SEED_GARAGES = [
   seedGarage("g4", {
     title: "Open yard spot, Hristo Botev (sample)", area: "Lagera", address: "bul. Hristo Botev 64",
     latitude: 42.6905, longitude: 23.3041, size: "medium", covered: false, price_hour: 1.5, price_day: 9, access: "manual",
-    // Host parks here evenings and weekends, so it's free Mon–Fri 08:00–18:00
     availability: [1, 2, 3, 4, 5].map((day) => ({ day, start: 8, end: 18 })),
   }),
   seedGarage("g5", {
@@ -59,7 +53,6 @@ const SEED_GARAGES = [
     title: "Covered spot on Cherni Vrah (sample)", area: "Lozenets", address: "bul. Cherni Vrah 47",
     latitude: 42.6712, longitude: 23.3261, size: "small", covered: true, price_hour: 2, price_day: 13, access: "manual",
   }),
-  // Outside Sofia, same as the samples in supabase/cities.sql
   seedGarage("g8", {
     title: "Garage near the Old Town (sample)", area: "Center", city: "Plovdiv",
     latitude: 42.1478, longitude: 24.7495, size: "medium", covered: true, price_hour: 2.5, price_day: 15, access: "manual",
@@ -70,7 +63,6 @@ const SEED_GARAGES = [
   }),
 ];
 
-// Clearly labelled sample reviews so the demo's sample garages aren't all "No reviews yet"
 const sampleReview = (garageId, days, rating, comment, author) => ({
   id: crypto.randomUUID(),
   garage_id: garageId,
@@ -95,17 +87,13 @@ const TABLE_RECHECK_MS = 30000;
 
 function createRepo(supabase) {
   const mem = { garages: [...SEED_GARAGES], bookings: [], payments: [], commands: [], reviews: [...SEED_REVIEWS] };
-  const tableOk = {}; // table -> { ok, checkedAt }
+  const tableOk = {};
 
-  // Whether Supabase has the table; falls back to memory if not. A found table is remembered;
-  // a missing one is checked again after TABLE_RECHECK_MS, so running the SQL while the
-  // server is up switches it over without a restart.
   async function hasTable(table) {
     const known = tableOk[table];
     if (known?.ok) return true;
     if (known && Date.now() - known.checkedAt < TABLE_RECHECK_MS) return false;
 
-    // A HEAD probe reports a missing table as success, so read one real row
     const { error } = await supabase.from(table).select("*").limit(1);
     tableOk[table] = { ok: !error, checkedAt: Date.now() };
     if (error && !known) console.warn(`${table}: using in-memory store (${error.message}). Checking again every 30 s.`);
@@ -118,10 +106,6 @@ function createRepo(supabase) {
     return data;
   };
 
-  // ---------- garages ----------
-  // A deleted garage keeps its row (renters' past tickets and the host's earnings still name it)
-  // but is gone everywhere else. Filtered here rather than in SQL so the server keeps working
-  // before supabase/garage-visibility.sql adds the column.
   const live = (rows, { includeDeleted = false } = {}) => (includeDeleted ? rows : rows.filter((g) => !g.deleted_at));
 
   async function listGarages(opts) {
@@ -159,12 +143,10 @@ function createRepo(supabase) {
     return garage;
   }
 
-  // Marks it deleted and gives it a new device key, so the old ESP32 can't reach it any more
   async function deleteGarage(id) {
     return updateGarage(id, { hidden: true, deleted_at: new Date().toISOString(), device_key: `deleted-${newDeviceKey()}` });
   }
 
-  // The caller checks the host owns it; host_id is never changed here
   async function updateGarage(id, fields) {
     if (await hasTable("garages")) return must(await supabase.from("garages").update(fields).eq("id", id).select("*").single());
     const garage = mem.garages.find((g) => g.id === id);
@@ -173,12 +155,8 @@ function createRepo(supabase) {
     return garage;
   }
 
-  // ---------- bookings ----------
-  // Statuses: pending_payment (holds the slot until expires_at) -> paid | cancelled | expired
   const LIVE = ["pending_payment", "paid"];
 
-  // Unpaid bookings past their hold become "expired". Done lazily before reads and overlap
-  // checks instead of on a timer; the database's overlap constraint relies on it.
   async function expireStaleBookings(now = new Date()) {
     const iso = now.toISOString();
     if (await hasTable("bookings")) {
@@ -190,7 +168,6 @@ function createRepo(supabase) {
     }
   }
 
-  // Bookings that block their slot: paid, or unpaid and still held
   async function listBookingsForGarage(garageId) {
     await expireStaleBookings();
     if (await hasTable("bookings")) {
@@ -218,7 +195,6 @@ function createRepo(supabase) {
     return booking ?? null;
   }
 
-  // Every booking of these garages, for the host's earnings
   async function listBookingsForGarages(garageIds) {
     if (!garageIds.length) return [];
     if (await hasTable("bookings")) return must(await supabase.from("bookings").select("*").in("garage_id", garageIds));
@@ -245,7 +221,6 @@ function createRepo(supabase) {
     return booking;
   }
 
-  // The renter's paid booking for this garage that covers "now", if any
   async function findActiveBooking(renterId, garageId, now = new Date()) {
     const iso = now.toISOString();
     if (await hasTable("bookings")) {
@@ -274,7 +249,6 @@ function createRepo(supabase) {
     );
   }
 
-  // ---------- payments ----------
   async function createPayment(fields) {
     const row = { status: "pending", currency: "EUR", ...fields };
     if (await hasTable("payments")) return must(await supabase.from("payments").insert(row).select("*").single());
@@ -318,8 +292,6 @@ function createRepo(supabase) {
     return mem.payments.filter((p) => bookingIds.includes(p.booking_id));
   }
 
-  // ---------- reviews ----------
-  // One review per booking; renters edit theirs instead of adding another
   async function listReviewsForGarage(garageId, limit = 20) {
     if (await hasTable("reviews")) {
       return must(
@@ -332,7 +304,6 @@ function createRepo(supabase) {
       .slice(0, limit);
   }
 
-  // Average and count per garage, for the garage list
   async function ratingSummaries() {
     const rows = (await hasTable("reviews"))
       ? must(await supabase.from("reviews").select("garage_id, rating"))
@@ -365,7 +336,6 @@ function createRepo(supabase) {
     return review;
   }
 
-  // ---------- door commands ----------
   async function createCommand(fields) {
     const row = { action: "open", status: "queued", ...fields };
     if (await hasTable("device_commands")) {
@@ -392,8 +362,6 @@ function createRepo(supabase) {
     return command ?? null;
   }
 
-  // Oldest queued command the device hasn't been handed yet. Marking it delivered stops a
-  // device that polls every second from opening the door twice for one tap.
   async function takeNextCommand(garageId) {
     let next;
     if (await hasTable("device_commands")) {

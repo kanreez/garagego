@@ -26,12 +26,10 @@ export default function Profile() {
     [user?.id]
   );
 
-  // The saved name until the user edits it; null = not edited
   const [draftName, setFullName] = useState<string | null>(null);
   const fullName = draftName ?? profile?.full_name ?? user?.user_metadata?.full_name ?? "";
   const [saving, setSaving] = useState(false);
 
-  // Saves to the profiles table and to the login's metadata
   const persist = async (updates: ProfileUpdate) => {
     if (!user) return;
     const saved = await updateProfile(user.id, updates);
@@ -42,7 +40,6 @@ export default function Profile() {
   const save = async () => {
     try {
       setSaving(true);
-      // The username is changed in Settings, where the server checks nobody else has it
       await persist({ full_name: fullName.trim() || null });
       notify(t("profile.saved"));
     } catch (e: any) {

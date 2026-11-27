@@ -24,7 +24,6 @@ type EmptyProps = {
   onAction?: () => void;
 };
 
-// An empty screen should tell the user what to do next
 export function EmptyState({ icon = "sparkles-outline", title, body, actionLabel, onAction }: EmptyProps) {
   return (
     <View style={styles.box}>

@@ -1,9 +1,6 @@
-// Fake card processor for the demo: no money moves, but it behaves like a real checkout.
-// The outcome is decided by the card number (test cards below). The full number is used only
-// to decide the outcome and is never stored or logged: only the last 4 digits and the brand.
 const { PaymentError } = require("./errors");
 
-const DELAY_MS = 1500; // feels like a real network round trip
+const DELAY_MS = 1500;
 
 const TEST_CARDS = {
   "4242424242424242": { status: "succeeded" },
@@ -29,7 +26,6 @@ function passesLuhn(digits) {
 
 const brandOf = (digits) => (digits[0] === "4" ? "Visa" : digits[0] === "5" ? "Mastercard" : "Card");
 
-// What the app gets back after a pay attempt
 const resultOf = (p) => ({
   status: p.status,
   message: p.failure_message ?? undefined,
@@ -55,7 +51,6 @@ function createMockProvider(repo) {
     if (!payment) throw new PaymentError(404, "Payment not found");
 
     const approving = actionConfirmed && payment.status === "requires_action";
-    // Same key again (a double tap or a retry after a lost response): answer what happened the first time
     if (payment.idempotency_key === idempotencyKey && !approving) return resultOf(payment);
 
     if (payment.status === "succeeded") throw new PaymentError(409, "This booking is already paid");
@@ -65,7 +60,6 @@ function createMockProvider(repo) {
 
     let patch;
     if (approving) {
-      // The renter approved in the (fake) bank app: same card as the attempt that asked for it
       if (payment.idempotency_key !== idempotencyKey) throw new PaymentError(409, "Approve the payment from the same attempt");
       patch = { status: "succeeded", failure_message: null };
     } else if (wallet) {
@@ -73,7 +67,7 @@ function createMockProvider(repo) {
     } else {
       const digits = String(cardNumber ?? "").replace(/[\s-]/g, "");
       if (!/^\d{12,19}$/.test(digits) || !passesLuhn(digits)) throw new PaymentError(400, "Card number is invalid.");
-      const outcome = TEST_CARDS[digits] ?? { status: "succeeded" }; // any other valid number works, so nobody gets stuck on stage
+      const outcome = TEST_CARDS[digits] ?? { status: "succeeded" };
       patch = {
         status: outcome.status,
         method: "card",

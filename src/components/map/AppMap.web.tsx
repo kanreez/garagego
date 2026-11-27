@@ -7,18 +7,11 @@ import { colors, doorPaint, fonts, radius } from "../../constants/theme";
 import { Coords } from "../../utils/location";
 import { AppMapProps, DEFAULT_ZOOM, MapPin } from "./types";
 
-// Browser map (Leaflet). Phones get AppMap.tsx (react-native-maps), which has no web support.
-// OpenStreetMap's standard tiles: no API key, attribution required, fine for light use.
-// For real traffic switch to a hosted tile provider (see the OSM tile usage policy).
 const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 const ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
-// The web font stack has double quotes ("Segoe UI"), which would end the style="" attribute
 const PIN_FONT = fonts.semibold.replace(/"/g, "'");
 
-// Price pill above the point: graphite, led by a square of the garage's door paint so the pin
-// matches its door in the list. Selected: ringed in that paint. iconSize 0 + a CSS translate
-// keeps it centred whatever its width.
 const pillIcon = (id: string, label: string, selected: boolean) => {
   const paint = doorPaint(id);
   return L.divIcon({
@@ -29,7 +22,6 @@ const pillIcon = (id: string, label: string, selected: boolean) => {
   });
 };
 
-// The garage's own pin: a drop in its door paint with a white dot
 const pickedIcon = (paint: string) =>
   L.divIcon({
     className: "",
@@ -48,10 +40,8 @@ export function AppMap({ center, zoom = DEFAULT_ZOOM, recenterKey, pins = [], se
       <MapContainer
         center={[center.latitude, center.longitude]}
         zoom={zoom}
-        // Half steps let "fit all pins" frame them tightly instead of jumping a whole level out
         zoomSnap={0.5}
         style={{ width: "100%", height: "100%" }}
-        // The wheel scrolls the page, not the map; zoom with the +/- buttons or by pinching
         scrollWheelZoom={false}
         dragging={interactive}
         doubleClickZoom={interactive}
@@ -72,25 +62,19 @@ export function AppMap({ center, zoom = DEFAULT_ZOOM, recenterKey, pins = [], se
   );
 }
 
-// Moves the map when `center` changes (e.g. "Use my location" or a new search), or frames
-// all of `fitTo` when given
 function Recenter({ center, zoom, recenterKey, fitTo }: { center: Coords; zoom: number; recenterKey?: number; fitTo: MapPin[] | null }) {
   const map = useMap();
   const fitKey = fitTo?.map((p) => `${p.latitude},${p.longitude}`).join("|") ?? "";
   useEffect(() => {
     const frame = () => {
-      // Leaflet measures its box once at start; React Native Web lays the page out after that,
-      // so re-measure before framing or the zoom is worked out for the wrong size
       map.invalidateSize();
       if (fitTo) map.fitBounds(L.latLngBounds(fitTo.map((p) => [p.latitude, p.longitude])), { padding: [36, 36], maxZoom: 16 });
       else map.setView([center.latitude, center.longitude], zoom);
     };
     frame();
-    // Frame again when the box changes size (layout settling, window resize, PC/phone switch)
     const observer = new ResizeObserver(frame);
     observer.observe(map.getContainer());
     return () => observer.disconnect();
-    // fitKey stands in for fitTo, which is a new array on every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, center.latitude, center.longitude, zoom, fitKey, recenterKey]);
   return null;
@@ -134,7 +118,5 @@ function PickedPin({ coords, paint, onPick }: { coords: Coords; paint: string; o
 }
 
 const styles = StyleSheet.create({
-  // zIndex 0 gives Leaflet's own z-indexed panes a stacking context, so they never sit above
-  // toasts or the sticky panels next to the map
   wrap: { overflow: "hidden", borderRadius: radius.lg, backgroundColor: colors.sand, zIndex: 0 },
 });

@@ -9,11 +9,6 @@ type ToastState = { message: string; type: ToastType; key: number } | null;
 
 let showRef: ((message: string, type?: ToastType) => void) | null = null;
 
-/**
- * Show a short message at the top of the screen. Works on web and phones
- * (unlike Alert.alert, which does nothing on web). Callable from anywhere:
- *   notify("Saved")            notify(e.message, "error")
- */
 export function notify(message: string, type: ToastType = "success") {
   if (showRef) showRef(message, type);
   else console.log(`[notify:${type}]`, message);

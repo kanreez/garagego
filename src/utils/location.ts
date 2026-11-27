@@ -13,12 +13,6 @@ export async function getCurrentLocation(): Promise<Coords> {
   return { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
 }
 
-export async function reverseGeocode(coords: Coords): Promise<string | null> {
-  const [place] = await Location.reverseGeocodeAsync(coords);
-  if (!place) return null;
-  return [place.name, place.city, place.region, place.country].filter(Boolean).join(", ");
-}
-
 export function distanceKm(a: Coords, b: Coords): number {
   const R = 6371;
   const toRad = (d: number) => (d * Math.PI) / 180;

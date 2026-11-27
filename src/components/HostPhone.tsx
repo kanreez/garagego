@@ -3,13 +3,11 @@ import { Linking, Pressable, StyleSheet, Text } from "react-native";
 import { colors, spacing, typography } from "../constants/theme";
 import { useT } from "../i18n";
 
-// "+359881234567" -> "+359 88 123 4567"; other countries stay as saved
 export function formatPhone(n: string) {
   const m = n.match(/^\+359(\d{2})(\d{3})(\d{3,4})$/);
   return m ? `+359 ${m[1]} ${m[2]} ${m[3]}` : n;
 }
 
-// The host's number as a quiet "call" link: tapping it opens the phone's dialer
 export function CallHost({ number }: { number: string }) {
   const { t } = useT();
   return (

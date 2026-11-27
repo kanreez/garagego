@@ -10,10 +10,8 @@ import { Button } from "./Button";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
 
-// Same icons as the phone tab bar in src/app/(tabs)/_layout.tsx
 const ICONS: Record<string, string> = { index: "search", bookings: "key", profile: "person" };
 
-// PC layout: replaces the floating bottom tab bar with a left-hand sidebar
 export function Sidebar({ state, descriptors, emitter, navigateToTab }: BottomTabBarProps) {
   const { t } = useT();
   return (
@@ -27,7 +25,6 @@ export function Sidebar({ state, descriptors, emitter, navigateToTab }: BottomTa
           const focused = state.index === i;
           const { title } = descriptors[route.key].options;
           const icon = ICONS[route.name] ?? "ellipse";
-          // Same as the default tab bar: let screens intercept the press, then switch tab
           const onPress = () => {
             const event = emitter.emit({ type: "tabPress", target: route.key, canPreventDefault: true });
             if (!focused && !event.defaultPrevented) navigateToTab(route.key);

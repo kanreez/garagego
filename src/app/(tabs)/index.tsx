@@ -26,7 +26,6 @@ import { Garage, SearchResult } from "../../types/garage";
 import { formatMoney, formatRange } from "../../utils/booking";
 import { Coords, distanceKm, getCurrentLocation } from "../../utils/location";
 
-// Screen 1: ask in plain language, see matching garages nearby
 export default function Find() {
   const { t } = useT();
   const [query, setQuery] = useState("");
@@ -39,7 +38,6 @@ export default function Find() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const all = useAsync(listGarages);
 
-  // Location is optional: without it the list keeps the server's order
   useEffect(() => {
     getCurrentLocation().then(setMe).catch(() => {});
   }, []);
@@ -51,10 +49,9 @@ export default function Find() {
     try {
       setSearching(true);
       const r = await searchGarages(q);
-      // Not a garage search: keep the normal list and suggest something that is
       if (r.off_topic) {
         setResult(null);
-        setHint(t("find.offTopic")); // the same fixed hint the server sends, in the app's language
+        setHint(t("find.offTopic"));
       } else {
         setHint(null);
         setResult(r);
@@ -66,7 +63,6 @@ export default function Find() {
     }
   };
 
-  // Distance from the area the renter asked about, else from where they are
   const origin = result?.center ?? me;
   const sortByDistance = (list: Garage[]) =>
     list
@@ -84,14 +80,12 @@ export default function Find() {
 
   const shown = result ? sortByDistance(result.garages) : sortByDistance(all.data ?? []);
 
-  // Map view: the same garages as the list, as price pins
   const pins: MapPin[] = shown.flatMap(({ garage: g }) =>
     g.latitude != null && g.longitude != null
       ? [{ id: g.id, latitude: g.latitude, longitude: g.longitude, label: t("find.pinPrice", { price: formatMoney(g.price_hour) }) }]
       : []
   );
   const selected = shown.find((s) => s.garage.id === selectedId) ?? null;
-  // The searched area, else the middle of the pins (your own location may be far from any garage)
   const mapCenter: Coords =
     result?.center ??
     (pins.length
@@ -122,7 +116,6 @@ export default function Find() {
           accessibilityLabel={t("find.askLabel")}
           style={{ minHeight: wide ? 84 : 56 }}
         />
-        {/* Phone: one sideways row, so the garage doors start in the first screen */}
         <ScrollView horizontal={!wide} showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.examples, !wide && styles.examplesRowContent]} style={wide ? undefined : styles.examplesRow}>
           {exampleQueries().map((q) => (
             <Pressable
@@ -138,7 +131,6 @@ export default function Find() {
             </Pressable>
           ))}
         </ScrollView>
-        {/* Phone: the button appears once there's something to search (the examples search on tap) */}
         {wide || query.trim() || searching ? (
           <Button
             title={t("find.submit")}
@@ -222,7 +214,6 @@ export default function Find() {
     <ScreenWrapper scroll refreshing={all.refreshing} onRefresh={all.refresh}>
       <StepTracker active={0} />
       {wide ? (
-        // PC: the ask panel stays in view on the left while the results scroll on the right
         <View style={styles.columns}>
           <View style={[styles.askColumn, stickyOnWeb]}>{ask}</View>
           <View style={styles.resultsColumn}>{results}</View>
@@ -237,10 +228,8 @@ export default function Find() {
   );
 }
 
-// position: sticky only exists on web; react-native-web passes it through
 const stickyOnWeb = (Platform.OS === "web" ? { position: "sticky", top: spacing.lg } : null) as ViewStyle | null;
 
-// One understood filter, set like a Bulgarian number plate: white strip, blue band on the left
 function Plate({ label }: { label: string }) {
   return (
     <View style={styles.plate}>
@@ -252,7 +241,6 @@ function Plate({ label }: { label: string }) {
   );
 }
 
-// Shows what the AI took from the request, so the renter can trust (or fix) the search
 function Understood({ result, onClear }: { result: SearchResult; onClear: () => void }) {
   const { t } = useT();
   const f = result.filters;
@@ -286,7 +274,6 @@ function Understood({ result, onClear }: { result: SearchResult; onClear: () => 
   );
 }
 
-// The blue band of a Bulgarian (EU) number plate: a material of the plate, not a theme colour
 const EU_PLATE_BLUE = "#1F3FA6";
 
 const styles = StyleSheet.create({
@@ -329,6 +316,5 @@ const styles = StyleSheet.create({
   mapHint: { ...typography.caption, color: colors.textMuted, marginTop: spacing.sm },
   columns: { flexDirection: "row", alignItems: "flex-start", gap: spacing.xl },
   askColumn: { width: 420 },
-  // The first SectionTitle's top margin would push the list below the ask panel's top edge
   resultsColumn: { flex: 1, minWidth: 0, marginTop: -spacing.xl },
 });

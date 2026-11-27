@@ -9,24 +9,20 @@ import { Chip, ChipRow } from "./Chip";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
 
-
-// What "Set hours" starts with: the garage is empty while the host is at work
 const WORKDAYS: AvailabilityWindow[] = [1, 2, 3, 4, 5].map((day) => ({ day, start: 8, end: 18 }));
 
 type Props = {
-  value: AvailabilityWindow[] | null; // null = free any time
+  value: AvailabilityWindow[] | null;
   onChange: (value: AvailabilityWindow[] | null) => void;
   error?: string;
 };
 
-// Host side: when the garage is empty and can be rented. One time range per day, whole hours.
 export function AvailabilityEditor({ value, onChange, error }: Props) {
   const { t } = useT();
   const modeOptions = [
     { value: "any", label: t("hours.anyTime") },
     { value: "set", label: t("hours.setHours") },
   ] as const;
-  // Switching to "Any time" and back keeps the hours the host already set
   const [lastSet, setLastSet] = useState<AvailabilityWindow[]>(value ?? WORKDAYS);
 
   const set = (next: AvailabilityWindow[]) => {

@@ -9,12 +9,8 @@ import { Button } from "./Button";
 import { PhoneField } from "./PhoneField";
 import { ScreenWrapper } from "./ScreenWrapper";
 
-// Every account needs a phone number. New accounts give it at sign-up; an older account without
-// one gets this single quiet step before the app, with no way past it except saving (or logging out).
-// While the check runs, and if the server can't be reached, the app shows as usual.
 export function PhoneGate({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  // The account that was found without a phone; another account starts unblocked
   const [missingFor, setMissingFor] = useState<string | null>(null);
   const userId = user?.id;
 
@@ -22,7 +18,6 @@ export function PhoneGate({ children }: { children: ReactNode }) {
     if (!userId) return;
     let cancelled = false;
     getMe()
-      // An older server doesn't send "phone" at all: don't block on a step it can't save
       .then((me) => !cancelled && setMissingFor("phone" in me && !me.phone ? userId : null))
       .catch(() => {});
     return () => {

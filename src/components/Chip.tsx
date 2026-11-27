@@ -36,7 +36,6 @@ type ChipRowProps<T extends string> = {
   onChange: (value: T) => void;
 };
 
-// Horizontally scrolling single-select row of chips
 export function ChipRow<T extends string>({ options, value, onChange }: ChipRowProps<T>) {
   return (
     <ScrollView

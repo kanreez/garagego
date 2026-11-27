@@ -18,7 +18,6 @@ import { colors } from "../constants/theme";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { LanguageProvider } from "../i18n";
 
-// Keep the splash screen up until the fonts are ready
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 function RootNavigator() {
@@ -69,7 +68,6 @@ export default function RootLayout() {
     if (fontsLoaded || fontError) SplashScreen.hideAsync().catch(() => {});
   }, [fontsLoaded, fontError]);
 
-  // If the fonts fail to load, the app still starts with the system font
   if (!fontsLoaded && !fontError) return null;
 
   return (

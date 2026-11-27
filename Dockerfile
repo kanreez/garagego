@@ -1,8 +1,3 @@
-# One image for Kuso: the Express backend, which also serves the web build from dist/.
-#   kuso env set <project> <service> EXPO_PUBLIC_SUPABASE_URL=... EXPO_PUBLIC_SUPABASE_ANON_KEY=...
-# reach this build as build args (they're public and end up in the browser bundle anyway).
-# The server's secrets (SUPABASE_SERVICE_ROLE_KEY, AI keys) are runtime env only.
-
 FROM node:22-bookworm-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json ./

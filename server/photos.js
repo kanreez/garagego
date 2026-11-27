@@ -1,7 +1,3 @@
-// Garage photos. The app sends the photo (already resized on the phone) as base64; the server
-// checks it really is a JPEG, PNG or WebP and stores it in Supabase Storage, in the public bucket
-// "garage-photos" (created on first use). If Storage can't be used, the file goes to
-// server/uploads and this server serves it, so listing a garage never depends on Storage.
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
@@ -10,7 +6,6 @@ const BUCKET = "garage-photos";
 const MAX_BYTES = 5 * 1024 * 1024;
 const UPLOADS_DIR = path.join(__dirname, "uploads");
 
-// Recognised by their first bytes, never by what the app says the file is
 const TYPES = [
   { mime: "image/jpeg", ext: "jpg", test: (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff },
   { mime: "image/png", ext: "png", test: (b) => b.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) },
@@ -19,7 +14,6 @@ const TYPES = [
 
 const sniff = (buffer) => (buffer.length >= 12 ? TYPES.find((t) => t.test(buffer)) ?? null : null);
 
-// "data:image/jpeg;base64,..." or bare base64 -> Buffer, or null if it isn't base64
 function decodeBase64(data) {
   const b64 = String(data ?? "").replace(/^data:[\w/+.-]+;base64,/, "").replace(/\s/g, "");
   if (!b64 || !/^[A-Za-z0-9+/]+={0,2}$/.test(b64)) return null;
@@ -40,12 +34,11 @@ function createPhotoStore(supabase) {
     if (error && !/already exists/i.test(error.message)) throw new Error(error.message);
   }
 
-  // -> the photo's public URL
   async function save({ buffer, type, userId, baseUrl }) {
     const name = `${userId}/${crypto.randomUUID()}.${type.ext}`;
     try {
       bucketReady ??= ensureBucket().catch((e) => {
-        bucketReady = null; // try again next time
+        bucketReady = null;
         throw e;
       });
       await bucketReady;

@@ -1,18 +1,15 @@
-// Shapes returned by server/server.js. Keep in sync with supabase/garages.sql.
-
 export type GarageSize = "small" | "medium" | "large";
-export type Access = "app" | "manual"; // app = door opened by the ESP32, manual = the host lets you in
+export type Access = "app" | "manual";
 export type BookingMode = "hour" | "day";
 
-// A weekly window the garage is free, in Sofia time: day 0 = Sunday (like Date#getDay), hours 0-24
 export type AvailabilityWindow = { day: number; start: number; end: number };
 
 export type Garage = {
   id: string;
   host_id: string | null;
   title: string;
-  city: string; // English name from CITIES (src/constants/garages.ts)
-  area: string; // a Sofia district from AREAS, or elsewhere the host's own district (or the city name)
+  city: string;
+  area: string;
   address: string | null;
   latitude: number | null;
   longitude: number | null;
@@ -23,24 +20,21 @@ export type Garage = {
   access: Access;
   image_url: string | null;
   description: string | null;
-  availability: AvailabilityWindow[] | null; // null = free any time
+  availability: AvailabilityWindow[] | null;
   created_at: string;
-  hidden?: boolean; // the host took it off search: no new bookings, existing ones still work
-  // Only on the host's own garages
+  hidden?: boolean;
   device_key?: string;
   device_last_seen?: string | null;
-  // From reviews; missing on search results
   rating?: RatingSummary;
 };
 
-// ---------- reviews ----------
 export type RatingSummary = { average: number | null; count: number };
 
 export type Review = {
   id: string;
-  rating: number; // 1-5
+  rating: number;
   comment: string | null;
-  author_name: string; // "Maria I."
+  author_name: string;
   created_at: string;
   updated_at: string;
 };
@@ -65,10 +59,8 @@ export type GarageInput = Pick<
 
 export type BusySlot = { starts_at: string; ends_at: string };
 
-// The host's phone on a garage page. hidden: it's private and shows once you've paid for a booking here.
 export type HostPhone = { number: string; public: boolean } | { number: null; public: false; hidden: true };
 
-// pending_payment holds the slot until expires_at; only "paid" can open the door
 export type BookingStatus = "pending_payment" | "paid" | "cancelled" | "expired";
 
 export type Booking = {
@@ -82,15 +74,14 @@ export type Booking = {
   amount_cents: number | null;
   status: BookingStatus;
   expires_at: string | null;
-  left_early_at?: string | null; // the renter left early: ends_at was moved to that minute
+  left_early_at?: string | null;
   created_at: string;
   garage: Garage | null;
   payment: PaymentSummary | null;
-  review: Review | null; // the renter's own review of this stay
-  host_phone?: string | null; // a paid booking always shows the host's number
+  review: Review | null;
+  host_phone?: string | null;
 };
 
-// ---------- payments (mock provider on the server; amounts in euro cents) ----------
 export type PaymentStatus = "pending" | "succeeded" | "declined" | "requires_action" | "refunded";
 
 export type PaymentSummary = {
@@ -103,7 +94,6 @@ export type PaymentSummary = {
   card_brand: string | null;
 };
 
-// What POST /api/bookings returns: an unpaid booking and the payment to confirm
 export type Checkout = {
   booking_id: string;
   payment_id: string;
@@ -138,15 +128,14 @@ export type Earnings = {
   }[];
 };
 
-// What the AI understood from the plain-language request
 export type SearchFilters = {
   city: string | null;
   area: string | null;
-  from: string | null; // local "YYYY-MM-DDTHH:mm"
+  from: string | null;
   to: string | null;
   vehicle_size: GarageSize | null;
   covered: boolean | null;
-  wants: string | null; // what to look for in titles and descriptions: "EV charger", "Shipka street"
+  wants: string | null;
 };
 
 export type SearchResult = {
@@ -154,14 +143,12 @@ export type SearchResult = {
   from_utc: string | null;
   to_utc: string | null;
   center: { latitude: number; longitude: number } | null;
-  wants_checked?: boolean; // the garages were checked against `wants` (false: that step was skipped)
+  wants_checked?: boolean;
   garages: Garage[];
-  // Set when the request wasn't about garages, parking or cars; hint is a fixed suggestion
   off_topic?: boolean;
   hint?: string;
 };
 
 export type DoorAction = "open" | "close";
-// "opened" = the device carried the command out, for "close" too
 export type CommandStatus = "queued" | "opened" | "error";
 export type Command = { status: CommandStatus; acked_at: string | null; error: string | null };

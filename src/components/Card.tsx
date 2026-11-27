@@ -6,7 +6,6 @@ type Props = ViewProps & {
   style?: StyleProp<ViewStyle>;
 };
 
-// Concrete surface, flat. Pass onPress to make it tappable.
 export function Card({ style, children, onPress, ...rest }: Props) {
   if (onPress) {
     return (

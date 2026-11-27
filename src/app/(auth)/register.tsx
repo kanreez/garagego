@@ -23,11 +23,9 @@ export default function Register() {
   const [phonePublic, setPhonePublic] = useState(true);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  // Shown inline: Alert.alert does nothing on web
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
 
-  // A phone problem is shown under the phone field, everything else under the password
   const phoneError = error === t("phone.required") || error === t("err.phoneInvalid");
 
   const onSubmit = async () => {
@@ -37,7 +35,6 @@ export default function Register() {
       setInfo("");
       if (!phone.trim()) throw new Error(t("phone.required"));
       const r = await signup({ firstName: firstName.trim(), lastName: lastName.trim(), email: email.trim(), phone, phonePublic, password });
-      // With a session the app moves on by itself; otherwise the account waits for the email link
       if (r.needsConfirmation) {
         setInfo(r.username ? t("register.confirmWithUsername", { username: r.username }) : t("register.confirm"));
       }

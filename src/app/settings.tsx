@@ -16,9 +16,8 @@ import { LANGS, useLanguage, useT } from "../i18n";
 import { translateError } from "../i18n/errors";
 import { checkUsername, getMe, Phone, savePhone, saveUsername } from "../services/account";
 
-const CHECK_DELAY_MS = 400; // wait for a pause in typing before asking the server
+const CHECK_DELAY_MS = 400;
 
-// Settings: change your username (if it's free), your phone and who sees it, and the language
 export default function Settings() {
   const { t } = useT();
   const { data, loading, error, reload, setData } = useAsync(getMe);
@@ -55,7 +54,6 @@ function UsernameCard({ current, onSaved }: { current: string | null; onSaved: (
   const wanted = value.trim().toLowerCase();
   const unchanged = wanted === (current ?? "").toLowerCase();
 
-  // Live check, after a short pause in typing; a newer keystroke cancels the older check
   useEffect(() => {
     if (!wanted || unchanged) return;
     let cancelled = false;

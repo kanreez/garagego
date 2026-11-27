@@ -1,8 +1,3 @@
-// Address search and reverse lookup for the listing form, through OpenStreetMap's Nominatim.
-// Its usage policy: at most 1 request a second, an identifying User-Agent, cache results, no
-// search-as-you-type. So every request goes through one queue spaced 1.1 s apart, results are
-// cached for the server's lifetime, and the app only searches when the host taps "Find on map".
-// Lookups never fail the form: on any problem the caller gets { unavailable: true }.
 const G = require("./garages");
 
 const BASE = "https://nominatim.openstreetmap.org";
@@ -11,13 +6,12 @@ const GAP_MS = 1100;
 const TIMEOUT_MS = 6000;
 const MAX_CACHE = 2000;
 
-const cache = new Map(); // full URL, lower-cased -> parsed JSON
+const cache = new Map();
 let queue = Promise.resolve();
 let lastSentAt = 0;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// Runs fn after every earlier request, at least GAP_MS after the previous one was sent
 function inQueue(fn) {
   const run = queue.then(async () => {
     const wait = lastSentAt + GAP_MS - Date.now();
@@ -29,7 +23,6 @@ function inQueue(fn) {
   return run;
 }
 
-// GET a Nominatim path -> parsed JSON, or throws
 async function nominatim(path, params) {
   const query = new URLSearchParams({ format: "jsonv2", addressdetails: "1", ...params });
   if (process.env.GEOCODER_EMAIL) query.set("email", process.env.GEOCODER_EMAIL);
@@ -47,14 +40,12 @@ async function nominatim(path, params) {
   return data;
 }
 
-// The CITIES entry a Nominatim place name refers to, in English or Bulgarian
 function matchCity(name) {
   if (!name) return null;
   const n = String(name).toLowerCase().replace(/^(град|grad|city of)\s+/, "");
   return G.CITIES.find((c) => c.name.toLowerCase() === n || c.bg.toLowerCase() === n)?.name ?? null;
 }
 
-// One Nominatim result -> what the app needs
 function normalize(item) {
   const a = item.address ?? {};
   const address = [a.road, a.house_number].filter(Boolean).join(" ") || item.name || null;
@@ -68,7 +59,6 @@ function normalize(item) {
 
 const usable = (r) => Number.isFinite(r.latitude) && Number.isFinite(r.longitude) && G.inBulgaria(r.latitude, r.longitude);
 
-// Up to 5 matches for an address inside the city's area
 async function searchAddress({ q, city, lang }) {
   const c = G.cityByName(city);
   try {
@@ -77,7 +67,6 @@ async function searchAddress({ q, city, lang }) {
       limit: "5",
       countrycodes: "bg",
       "accept-language": lang,
-      // left, top, right, bottom
       viewbox: [c.longitude - 0.2, c.latitude + 0.15, c.longitude + 0.2, c.latitude - 0.15].map((n) => n.toFixed(4)).join(","),
       bounded: "1",
     });
@@ -88,7 +77,6 @@ async function searchAddress({ q, city, lang }) {
   }
 }
 
-// The street address at a point, or null if there's none (a field, the sea...)
 async function reverseGeocode({ lat, lng, lang }) {
   try {
     const data = await nominatim("/reverse", { lat: lat.toFixed(6), lon: lng.toFixed(6), zoom: "18", "accept-language": lang });
@@ -101,4 +89,4 @@ async function reverseGeocode({ lat, lng, lang }) {
   }
 }
 
-module.exports = { searchAddress, reverseGeocode, matchCity };
+module.exports = { searchAddress, reverseGeocode };

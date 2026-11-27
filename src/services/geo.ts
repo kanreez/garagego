@@ -2,14 +2,11 @@ import { getLang } from "../i18n";
 import { Coords } from "../utils/location";
 import { api } from "./api";
 
-// Address lookups for the listing form. They go through our server (one queue and cache for
-// OpenStreetMap's Nominatim), never straight to Nominatim. `unavailable` means the lookup
-// service is down: the host can still tap the map.
 export type GeoPlace = {
-  label: string; // "ул. Цар Самуил 110, Лагера"
+  label: string;
   address: string | null;
   district: string | null;
-  city: string | null; // a CITIES name, if the place is in one
+  city: string | null;
   latitude: number;
   longitude: number;
 };

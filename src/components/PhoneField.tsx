@@ -11,11 +11,9 @@ type Props = {
   onPublicChange: (v: boolean) => void;
   error?: string;
   onSubmitEditing?: () => void;
-  // Off in Settings itself, where "change it later in Settings" makes no sense
   showChangeNote?: boolean;
 };
 
-// The phone number plus who may see it. Used at sign-up, in the one-time phone step and in Settings.
 export function PhoneField({ phone, onPhoneChange, isPublic, onPublicChange, error, onSubmitEditing, showChangeNote = true }: Props) {
   const { t } = useT();
   return (

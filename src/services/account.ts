@@ -1,7 +1,5 @@
 import { api } from "./api";
 
-// Account calls that need the server: username lookups check every profile, not just your own
-// public: anyone who opens your garage sees it; private: only renters who paid for a booking
 export type Phone = { number: string; public: boolean };
 
 export type Me = {

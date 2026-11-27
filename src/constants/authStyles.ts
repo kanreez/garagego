@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
 import { colors, spacing, typography } from "./theme";
 
-// Shared by login and register
 export const authStyles = StyleSheet.create({
   page: { justifyContent: "center", maxWidth: 480, width: "100%", alignSelf: "center" },
   intro: { gap: spacing.md, marginTop: spacing.xl, marginBottom: spacing.xl },

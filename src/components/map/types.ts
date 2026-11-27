@@ -1,23 +1,21 @@
 import { StyleProp, ViewStyle } from "react-native";
 import { Coords } from "../../utils/location";
 
-// A garage on the map, drawn as a small price pill
 export type MapPin = Coords & { id: string; label: string };
 
-// Shared by AppMap.tsx (phone, react-native-maps) and AppMap.web.tsx (PC / browser, Leaflet)
 export type AppMapProps = {
-  center: Coords; // where the map looks; changing it moves the map there
-  zoom?: number; // 13 ≈ a whole city, 15 ≈ a few streets, 17 ≈ one street
-  recenterKey?: number; // changing it moves the map to center/zoom again, even if they're the same
+  center: Coords;
+  zoom?: number;
+  recenterKey?: number;
   pins?: MapPin[];
   selectedId?: string | null;
   onSelectPin?: (id: string) => void;
-  picked?: Coords | null; // a single pin, e.g. the garage's location
-  pickedPaint?: string; // that pin's colour: the garage's door paint (doorPaint), so it matches its door
-  onPick?: (coords: Coords) => void; // with it, tapping the map or dragging the pin moves `picked`
-  fitToPins?: boolean; // frame all pins (when there are 2+) instead of using center/zoom
-  interactive?: boolean; // false = a still preview that can't be panned or zoomed
-  style?: StyleProp<ViewStyle>; // give it a height
+  picked?: Coords | null;
+  pickedPaint?: string;
+  onPick?: (coords: Coords) => void;
+  fitToPins?: boolean;
+  interactive?: boolean;
+  style?: StyleProp<ViewStyle>;
 };
 
 export const DEFAULT_ZOOM = 14;

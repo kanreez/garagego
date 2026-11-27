@@ -12,7 +12,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-// During web SSR (Node) there is no window, so don't touch storage
 const isServer = Platform.OS === "web" && typeof window === "undefined";
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {

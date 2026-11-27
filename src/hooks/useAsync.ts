@@ -1,13 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-/**
- * Runs an async function and tracks loading / error / data.
- *
- *   const { data, loading, error, reload } = useAsync(() => listItems(), []);
- *
- * `deps` works like useEffect's dependency list: the function re-runs when they change.
- * Call reload() for pull-to-refresh or after saving.
- */
 export function useAsync<T>(fn: () => Promise<T>, deps: unknown[] = []) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,8 +24,6 @@ export function useAsync<T>(fn: () => Promise<T>, deps: unknown[] = []) {
     }
   }, []);
 
-  // Loads on mount and when deps change. State is set only once the answer arrives, and an
-  // answer that arrives after the deps changed again (or after unmount) is dropped.
   useEffect(() => {
     let current = true;
     fnRef.current().then(

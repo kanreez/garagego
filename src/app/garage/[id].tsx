@@ -47,10 +47,8 @@ import { timeAgo } from "../../utils/time";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
 
-
 const DAYS_AHEAD = 14;
 
-// Screen 2: the garage, a time picker, the total, and Confirm. The AI never books: this tap does.
 export default function Book() {
   const { id, from, to } = useLocalSearchParams<{ id: string; from?: string; to?: string }>();
   const { t } = useT();
@@ -75,7 +73,6 @@ export default function Book() {
   return <BookForm garage={data.garage} hostPhone={data.host_phone ?? null} busy={data.busy} reviews={data.reviews ?? []} from={from} to={to} />;
 }
 
-// Where the picker starts: the time the AI understood if there was one, else from this hour
 function initialPick(from?: string, to?: string) {
   const minStart = startOfHour(new Date());
   const f = from ? new Date(from) : null;
@@ -115,11 +112,10 @@ function BookForm({ garage, hostPhone, busy, reviews, from, to }: { garage: Gara
 
   const now = new Date();
   const minStart = startOfHour(now);
-  // The current hour starts now, to the minute: someone may have just left early
   const nowMinute = startOfMinute(now);
   const isToday = startOfDay(now).getTime() === day.getTime();
   const firstHour = isToday ? minStart.getHours() : 0;
-  const hour = Math.max(startHour, firstHour); // a day change can leave the old hour in the past
+  const hour = Math.max(startHour, firstHour);
 
   let start: Date;
   let end: Date;
@@ -129,7 +125,7 @@ function BookForm({ garage, hostPhone, busy, reviews, from, to }: { garage: Gara
     if (isToday && hour === firstHour) start = nowMinute;
     end = addHours(start, hours);
   } else {
-    start = isToday ? nowMinute : day; // today's day booking starts now, not at midnight
+    start = isToday ? nowMinute : day;
     end = addDays(day, days);
   }
   const total = priceFor(garage, start, end, mode);
@@ -137,7 +133,6 @@ function BookForm({ garage, hostPhone, busy, reviews, from, to }: { garage: Gara
   const outsideHours = !isAvailable(garage, start, end);
   const dayOptions = Array.from({ length: DAYS_AHEAD }, (_, i) => addDays(startOfDay(now), i));
 
-  // Confirm creates the booking unpaid (slot held 10 min) and opens the pay sheet
   const confirm = async () => {
     try {
       setSaving(true);
@@ -155,7 +150,6 @@ function BookForm({ garage, hostPhone, busy, reviews, from, to }: { garage: Gara
     router.replace("/bookings");
   };
 
-  // Backed out of paying: free the slot now instead of holding it for 10 minutes
   const closeSheet = () => {
     if (checkout) cancelBooking(checkout.booking_id).catch(() => {});
     setCheckout(null);
@@ -199,7 +193,6 @@ function BookForm({ garage, hostPhone, busy, reviews, from, to }: { garage: Gara
       <Button title={t("book.directions")} icon="navigate" variant="secondary" size="sm" onPress={() => openDirections(garage)} style={{ alignSelf: "flex-start", marginTop: spacing.md }} />
 
       {spot ? (
-        // A still preview: where it is at a glance; Directions opens Google Maps for the route
         <AppMap center={spot} zoom={16} picked={spot} pickedPaint={doorPaint(garage.id)} interactive={false} style={styles.map} />
       ) : null}
 
@@ -216,7 +209,7 @@ function BookForm({ garage, hostPhone, busy, reviews, from, to }: { garage: Gara
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.days}>
         {dayOptions.map((d) => {
           const selected = d.getTime() === day.getTime();
-          const [top, bottom] = formatDay(d, now).split(/ (?=\d)/); // "Sat" / "31 Oct", or "Today"
+          const [top, bottom] = formatDay(d, now).split(/ (?=\d)/);
           return (
             <Pressable
               key={d.toISOString()}
@@ -305,7 +298,6 @@ function BookForm({ garage, hostPhone, busy, reviews, from, to }: { garage: Gara
     </>
   );
 
-  // "2 h × €3 = €6", from the server's numbers once the booking exists
   const breakdown = checkout
     ? `${checkout.unit === "hour" ? t("duration.h", { h: checkout.units }) : tn("duration.days", checkout.units)} × ${formatCents(checkout.unit_price_cents)} = ${formatCents(checkout.amount_cents)}`
     : "";
@@ -328,7 +320,6 @@ function BookForm({ garage, hostPhone, busy, reviews, from, to }: { garage: Gara
       <StepTracker active={1} />
 
       {wide ? (
-        // PC: garage details on the left, the booking panel beside them
         <View style={styles.columns}>
           <View style={styles.detailsColumn}>{details}</View>
           <View style={[styles.bookingPanel, stickyOnWeb]}>{booking}</View>
@@ -353,7 +344,6 @@ function Fact({ label, value, figure }: { label: string; value: string; figure?:
   );
 }
 
-// What renters who parked here said: the average large, then each review as a flat row
 function Reviews({ rating, reviews }: { rating?: RatingSummary; reviews: Review[] }) {
   const { t, tn } = useT();
   return (
@@ -421,14 +411,12 @@ function StepButton({ icon, label, onPress, disabled }: { icon: IconName; label:
   );
 }
 
-// position: sticky only exists on web; react-native-web passes it through
 const stickyOnWeb = (Platform.OS === "web" ? { position: "sticky", top: spacing.lg } : null) as ViewStyle | null;
 
 const styles = StyleSheet.create({
   columns: { flexDirection: "row", alignItems: "flex-start", gap: spacing.xl },
   map: { height: 200, marginTop: spacing.md },
   detailsColumn: { flex: 1, minWidth: 0 },
-  // "When?" opens with its own top margin, so the panel needs no top padding
   bookingPanel: {
     width: 460,
     paddingHorizontal: spacing.lg,
@@ -438,7 +426,6 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.surface,
   },
-  // The garage's own door beside its name: the same door as in the list and in Bookings
   hero: { flexDirection: "row", alignItems: "flex-start", gap: spacing.md, marginBottom: spacing.lg },
   heroText: { flex: 1, gap: spacing.xs },
   heroTitle: { ...typography.h1, color: colors.ink },
@@ -452,7 +439,6 @@ const styles = StyleSheet.create({
   factLabel: { ...typography.label, color: colors.textMuted, width: 84 },
   factValue: { ...typography.h3, color: colors.ink, flex: 1 },
   factFigure: { ...typography.figureSm },
-  // Review count and dates: same voice as the fact labels, without their fixed column width
   meta: { ...typography.caption, color: colors.textMuted },
   ratingHead: { flexDirection: "row", alignItems: "center", gap: spacing.md, marginBottom: spacing.sm },
   ratingFigure: { ...typography.figure, color: colors.ink },

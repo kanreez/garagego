@@ -8,14 +8,12 @@ type AuthContextType = {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  // identifier: an email or a username
   login: (identifier: string, password: string) => Promise<void>;
   signup: (input: SignupInput) => Promise<SignupResult>;
   logout: () => Promise<void>;
 };
 
 export type SignupInput = { firstName: string; lastName: string; email: string; phone: string; phonePublic: boolean; password: string };
-// username: what the server picked from the name; needsConfirmation: check the inbox before logging in
 export type SignupResult = { username: string | null; needsConfirmation: boolean };
 
 type Tokens = { access_token: string; refresh_token: string };
@@ -42,8 +40,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  // An email goes straight to Supabase (works even if the server is down). A username goes
-  // through the server, which finds the account without ever telling the app its email.
   const login = async (identifier: string, password: string) => {
     if (identifier.includes("@")) {
       const { error } = await supabase.auth.signInWithPassword({ email: identifier, password });
@@ -55,7 +51,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
   };
 
-  // Through the server, which also picks a free username from the name
   const signup = async ({ firstName, lastName, email, phone, phonePublic, password }: SignupInput): Promise<SignupResult> => {
     const res = await api.post<Partial<Tokens> & { username: string | null; needs_confirmation?: boolean }>("/api/auth/signup", {
       first_name: firstName,

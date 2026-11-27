@@ -16,22 +16,17 @@ type Props = {
   onPress?: () => void;
 };
 
-export function formatKm(km: number) {
+function formatKm(km: number) {
   return km < 1 ? t("units.m", { n: Math.round(km * 1000) }) : t("units.km", { n: km.toFixed(1) });
 }
 
-// One garage in a list: a flat row between hairlines, led by the garage's own painted door so the
-// renter knows it again on the garage page and in Bookings.
-// The tappable info area and the directions button sit side by side, not one inside the
-// other: on web each becomes a <button>, and a button can't contain another button.
 export function GarageRow({ garage: g, distanceKm, onPress }: Props) {
-  useT(); // re-render in a new language
+  useT();
   const app = g.access === "app";
   const where = distanceKm != null ? `${placeLabel(g)}, ${formatKm(distanceKm)}` : placeLabel(g);
   const spec = `${SIZE_META[g.size].label}, ${(g.covered ? t("garage.covered") : t("garage.openAir")).toLowerCase()}`;
   const info = (
     <>
-      {/* Compact: one line each, so two or more doors fit in a phone's first screen */}
       <View style={styles.body}>
         <Text style={styles.title} numberOfLines={1}>
           {g.title}
@@ -41,7 +36,6 @@ export function GarageRow({ garage: g, distanceKm, onPress }: Props) {
         </Text>
         <View style={styles.badges}>
           <RatingLine rating={g.rating} />
-          {/* Opens from the phone: an icon here, spelled out in the row's accessibility label */}
           {app ? <Ionicons name="phone-portrait" size={14} color={colors.accentDeep} accessibilityElementsHidden importantForAccessibility="no" /> : null}
         </View>
       </View>

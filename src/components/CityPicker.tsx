@@ -9,11 +9,10 @@ import { Input } from "./Input";
 
 type Props = {
   label: string;
-  value: string; // a CITIES name
+  value: string;
   onChange: (name: string) => void;
 };
 
-// The four big cities first, the rest alphabetically in the app language
 function ordered(): City[] {
   const lang = getLang();
   const shown = (c: City) => (lang === "bg" ? c.bg : c.name);
@@ -22,8 +21,6 @@ function ordered(): City[] {
   return [...big, ...rest];
 }
 
-// A field showing the chosen city; tapping it opens a list with a search box. Typing matches the
-// English and the Bulgarian names.
 export function CityPicker({ label, value, onChange }: Props) {
   const { t } = useT();
   const wide = useIsWide();
@@ -57,7 +54,6 @@ export function CityPicker({ label, value, onChange }: Props) {
 
       <Modal visible={open} transparent animationType={wide ? "fade" : "slide"} onRequestClose={close}>
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={[styles.backdrop, wide && styles.backdropWide]}>
-          {/* Tapping outside the sheet closes it */}
           <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityLabel={t("common.close")} />
           <View style={[styles.sheet, wide && styles.sheetWide]}>
             <View style={styles.head}>
@@ -97,7 +93,6 @@ export function CityPicker({ label, value, onChange }: Props) {
 
 const styles = StyleSheet.create({
   label: { ...typography.label, color: colors.ink },
-  // Looks like Input's box
   field: {
     minHeight: 54,
     flexDirection: "row",

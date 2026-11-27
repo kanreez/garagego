@@ -1,4 +1,3 @@
-// English. Every key here must also be in bg.ts (TypeScript checks it).
 export const en = {
   "app.tagline": "Find a garage. Book it. Open it from your phone.",
   "tabs.find": "Find",

@@ -9,13 +9,10 @@ import { Input } from "./Input";
 import { StarPicker, Stars } from "./Stars";
 import { notify } from "./Toast";
 
-const MAX_COMMENT = 500; // same limit as the server
+const MAX_COMMENT = 500;
 
-// The server accepts a review once the booking is paid and has started
 export const canReview = (b: Booking, now: Date) => b.status === "paid" && new Date(b.starts_at) <= now;
 
-// Rate a stay from My bookings: a quiet button, then stars and an optional comment.
-// Saving again edits the same review.
 export function ReviewBox({ booking, onSaved }: { booking: Booking; onSaved?: () => void }) {
   const { t } = useT();
   const existing = booking.review;

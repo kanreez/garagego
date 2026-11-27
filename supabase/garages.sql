@@ -1,11 +1,3 @@
--- Tables for the garage app. Run in Supabase: SQL Editor → New query → paste → Run.
--- Until these exist the server keeps everything in memory (see server/repo.js).
---
--- The app never reads these tables directly: everything goes through the Express server
--- (service role key), which hides each garage's device_key from renters and is the only
--- place that decides whether a booking is paid or may open a door. So RLS is on with no
--- client policies, payments included (hosts see earnings through GET /api/host/earnings).
-
 create extension if not exists btree_gist;
 
 create table if not exists public.garages (
@@ -23,15 +15,11 @@ create table if not exists public.garages (
   access text not null check (access in ('app', 'manual')),
   image_url text,
   description text check (char_length(description) <= 500),
-  -- Weekly hours the garage is free, in Sofia time: [{"day": 0-6 (0 = Sunday), "start": 0-23, "end": 1-24}].
-  -- null = free any time. The server checks bookings against it.
   availability jsonb,
-  -- Secret the garage's ESP32 is flashed with
   device_key text not null unique default encode(gen_random_bytes(16), 'hex'),
   created_at timestamptz not null default now()
 );
 
--- For a garages table created before these columns existed
 alter table public.garages add column if not exists description text check (char_length(description) <= 500);
 alter table public.garages add column if not exists availability jsonb;
 
@@ -44,18 +32,14 @@ create table if not exists public.bookings (
   mode text not null check (mode in ('hour', 'day')),
   total_price numeric not null,
   amount_cents int,
-  -- pending_payment -> paid (door may open) | cancelled | expired (unpaid past expires_at)
   status text not null default 'pending_payment'
     constraint bookings_status_check check (status in ('pending_payment', 'paid', 'cancelled', 'expired')),
-  -- An unpaid booking holds its slot until this time; the server marks it expired after
   expires_at timestamptz,
   created_at timestamptz not null default now(),
-  -- Two live bookings of the same garage can never overlap, even if two taps race
   constraint bookings_no_overlap exclude using gist (garage_id with =, tstzrange(starts_at, ends_at) with &&)
     where (status in ('pending_payment', 'paid'))
 );
 
--- For a bookings table created before payments: confirmed bookings count as paid
 alter table public.bookings add column if not exists amount_cents int;
 alter table public.bookings add column if not exists expires_at timestamptz;
 alter table public.bookings drop constraint if exists bookings_status_check;
@@ -69,8 +53,6 @@ alter table public.bookings add constraint bookings_no_overlap exclude using gis
 
 create index if not exists bookings_renter_idx on public.bookings (renter_id, starts_at desc);
 
--- One payment per booking. Mock for now (server/payments/mock.js); amounts in integer cents.
--- The full card number is never stored: only the last 4 digits and the brand.
 create table if not exists public.payments (
   id uuid primary key default gen_random_uuid(),
   booking_id uuid not null unique references public.bookings (id) on delete cascade,
@@ -84,7 +66,6 @@ create table if not exists public.payments (
   card_last4 text,
   card_brand text,
   failure_message text,
-  -- The app's key for one pay attempt: the same key twice returns the first result
   idempotency_key text unique,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -110,8 +91,6 @@ alter table public.bookings enable row level security;
 alter table public.device_commands enable row level security;
 alter table public.payments enable row level security;
 
--- Seed: 7 garages in Lagera / Krasno Selo / Lozenets, two of them opened from the app.
--- The two app garages use the same dev keys as the in-memory seed, so a flashed ESP32 keeps working.
 insert into public.garages (title, area, address, latitude, longitude, size, covered, price_hour, price_day, access, device_key, availability)
 values
   ('Covered garage by Pirogov (sample)', 'Lagera', 'ul. Tsar Samuil 110', 42.6879, 23.3009, 'medium', true, 3, 20, 'app', 'dev-door-lagera-1', null),

@@ -1,6 +1,3 @@
-# Render Blueprint for the GarageGo backend (server/server.js).
-# Render dashboard → New → Blueprint → pick this repository. It asks for the secrets marked
-# sync: false; paste them from server/.env (never commit them).
 services:
   - type: web
     name: garagego-api

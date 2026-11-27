@@ -1,6 +1,5 @@
 import type { en } from "./en";
 
-// Bulgarian, the default language. Must have every key that en.ts has (TypeScript checks it).
 export const bg: Record<keyof typeof en, string> = {
   "app.tagline": "Намери гараж. Резервирай. Отвори го от телефона.",
   "tabs.find": "Търси",

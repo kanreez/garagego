@@ -1,17 +1,3 @@
-# garagego: start and stop everything the GarageGo demo needs, from one command.
-#
-#   garagego start   server + public tunnel + website + website tunnel (phone, ESP32, Wokwi)
-#   garagego local   server + website only, for a phone on the same Wi-Fi as this PC
-#   garagego stop    close every window garagego opened
-#   garagego stop --force   also close whatever else holds ports 3000 or 8081
-#   garagego urls    show the current tunnel addresses again
-#   garagego deploy [backend-url]   build the website and publish it to Cloudflare Pages
-#                                   (garagego.pages.dev), pointed at the cloud backend
-#
-# Each part runs in its own window titled "GarageGo ...", so you can read its logs.
-# The server tunnel's address changes on every start; this script writes it into .env
-# (EXPO_PUBLIC_API_URL) before the website starts, so the app always talks to it.
-
 param([string]$Command = "help", [string]$Option = "")
 
 $ErrorActionPreference = "Stop"
@@ -20,7 +6,6 @@ $EnvFile = Join-Path $Root ".env"
 $LogDir = Join-Path $env:TEMP "garagego"
 $ServerLog = Join-Path $LogDir "tunnel-server.log"
 $WebLog = Join-Path $LogDir "tunnel-web.log"
-# The cloud backend (Render) the published website talks to; `garagego deploy <url>` updates it
 $ProductionApiFile = Join-Path $PSScriptRoot "production-api-url.txt"
 $PagesProject = "garagego"
 
@@ -32,7 +17,6 @@ function Test-Port([int]$Port) {
   [bool](Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue)
 }
 
-# cloudflared prints the quick tunnel's address once it's up; wait for it in the log file
 function Wait-TunnelUrl([string]$Log) {
   for ($i = 0; $i -lt 60; $i++) {
     if (Test-Path $Log) {
@@ -50,15 +34,12 @@ function Start-Tunnel([string]$Title, [int]$Port, [string]$Log) {
   Wait-TunnelUrl $Log
 }
 
-# Sets (or, with an empty value, comments out) EXPO_PUBLIC_API_URL in .env, keeping every other line
 function Set-ApiUrl([string]$Url) {
   $lines = if (Test-Path $EnvFile) { @(Get-Content $EnvFile) } else { @() }
   $lines = @($lines | Where-Object { $_ -notmatch "^\s*#?\s*EXPO_PUBLIC_API_URL=" -and $_ -notmatch "^# Server through the cloudflared tunnel" })
   if ($Url) {
-    $lines += "# Server through the cloudflared tunnel (garagego start writes this; it changes every start)"
     $lines += "EXPO_PUBLIC_API_URL=$Url"
   }
-  # No byte-order mark: Expo would read it as part of the first variable's name
   [System.IO.File]::WriteAllLines($EnvFile, [string[]]$lines, (New-Object System.Text.UTF8Encoding($false)))
 }
 
@@ -76,7 +57,6 @@ function Show-Urls {
 }
 
 function Stop-All([bool]$Force) {
-  # /T closes each window's children too (node, cloudflared)
   & taskkill.exe /FI "WINDOWTITLE eq GarageGo*" /T /F 2>$null | Out-Null
   Write-Host "Closed the GarageGo windows."
   if (-not $Force) {
@@ -85,7 +65,6 @@ function Stop-All([bool]$Force) {
     }
     return
   }
-  # --force: whatever else listens on the demo's ports (servers started by hand or by another tool)
   $owners = Get-NetTCPConnection -LocalPort 3000, 8081 -State Listen -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
   foreach ($procId in $owners) {
     $name = (Get-Process -Id $procId -ErrorAction SilentlyContinue).ProcessName
@@ -113,7 +92,6 @@ function Start-All([bool]$Tunnels) {
     }
     Set-ApiUrl $server
   } else {
-    # Local mode: the app finds the server on this PC by itself
     Set-ApiUrl ""
   }
 
@@ -134,8 +112,6 @@ function Start-All([bool]$Tunnels) {
   Write-Host "The website takes about a minute to build the first time. Stop everything with: garagego stop"
 }
 
-# Builds the web app with the cloud backend's address baked in, then uploads it to Cloudflare
-# Pages. The first run asks you to log in to Cloudflare in the browser (wrangler login).
 function Publish-Site([string]$ApiUrl) {
   if ($ApiUrl) { Set-Content -Path $ProductionApiFile -Value $ApiUrl.TrimEnd("/") -Encoding ascii }
   if (-not (Test-Path $ProductionApiFile)) {
@@ -146,12 +122,9 @@ function Publish-Site([string]$ApiUrl) {
   Write-Host "Building the website for backend $api ..."
   Push-Location $Root
   try {
-    # The process environment wins over .env, so .env's local tunnel address is not used here
     $env:EXPO_PUBLIC_API_URL = $api
     & npx expo export --platform web --output-dir dist
     if ($LASTEXITCODE -ne 0) { throw "The website build failed." }
-    # Cloudflare Pages never uploads folders named node_modules, and Expo puts every font, icon
-    # and image under dist/assets/node_modules. Rename it and point the code at the new folder.
     $assets = Join-Path $Root "dist\assets"
     if (Test-Path (Join-Path $assets "node_modules")) {
       Rename-Item (Join-Path $assets "node_modules") "vendor"
@@ -162,8 +135,6 @@ function Publish-Site([string]$ApiUrl) {
         }
       }
     }
-    # Make the site installable: Expo's single-page output ignores a custom html template, so the
-    # manifest / icon / iPhone tags (scripts/pwa-head.html) are added to the built index.html here.
     $indexPath = Join-Path $Root "dist\index.html"
     $pwaHead = [System.IO.File]::ReadAllText((Join-Path $PSScriptRoot "pwa-head.html")).Trim()
     $html = [System.IO.File]::ReadAllText($indexPath)
@@ -171,9 +142,6 @@ function Publish-Site([string]$ApiUrl) {
     $html = $html.Replace('<link rel="icon" href="/favicon.ico"/>', '').Replace("</head>", "$pwaHead`n</head>")
     [System.IO.File]::WriteAllText($indexPath, $html, (New-Object System.Text.UTF8Encoding($false)))
     Write-Host "Publishing to Cloudflare Pages ($PagesProject.pages.dev) ..."
-    # Run wrangler outside the project: in a project folder it may rewrite package.json and add its
-    # own config while "helping". The Pages project must exist; on a new Cloudflare account create it
-    # once with: npx wrangler@4 pages project create garagego --production-branch main --force
     $dist = Join-Path $Root "dist"
     Push-Location $env:TEMP
     try {

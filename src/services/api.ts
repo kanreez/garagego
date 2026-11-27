@@ -3,12 +3,6 @@ import { Platform } from "react-native";
 import { translateError } from "../i18n/errors";
 import { supabase } from "./supabase";
 
-// In dev, Expo's hostUri is your PC's address as the phone sees it (e.g. "192.168.1.50:8081"),
-// so the backend on the same PC is reachable from a real phone without editing anything.
-// On web it's the address the page was opened at, so another laptop on the Wi-Fi that opens
-// http://<your PC>:8081 talks to the backend on your PC, not to "localhost" on itself.
-// A production web build is served by the backend itself (see Dockerfile), so it calls its own origin.
-// Set EXPO_PUBLIC_API_URL to override (e.g. a deployed backend).
 const devHost =
   Platform.OS === "web" && typeof window !== "undefined"
     ? window.location.hostname

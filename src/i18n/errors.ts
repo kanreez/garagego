@@ -1,7 +1,5 @@
 import { t, TKey } from "./index";
 
-// The server and Supabase answer in English. Known messages are translated here, where they
-// arrive (services/api.ts, AuthContext); anything unknown is shown as it came.
 const EXACT: Record<string, TKey> = {
   "Wrong username, email or password": "err.badLogin",
   "Invalid login credentials": "err.badLogin",
@@ -87,7 +85,6 @@ export function translateError(message: string): string {
     const m = message.match(re);
     if (m) return make(m);
   }
-  // Never show a raw HTML page (e.g. a Cloudflare block) or a long unknown dump to the user
   const looksLikeHtml = message.includes("<") && /<\/?[a-z!]/i.test(message);
   if (!message.trim() || looksLikeHtml || message.length > 160) return t("err.generic");
   return message;
