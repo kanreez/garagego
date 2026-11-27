@@ -1,7 +1,7 @@
 const G = require("./garages");
 
 const BASE = "https://nominatim.openstreetmap.org";
-const USER_AGENT = "GarageGo/1.0 (hackathon demo)";
+const USER_AGENT = "GarageGo/1.0 (https://garagego.pages.dev)";
 const GAP_MS = 1100;
 const TIMEOUT_MS = 6000;
 const MAX_CACHE = 2000;

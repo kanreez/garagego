@@ -3,7 +3,7 @@
 Rent a neighbour's garage by the hour, anywhere in Bulgaria. Say what you need in plain words
 ("покрит гараж в Лозенец утре от 9 до 13 за джип"), book it, pay, and open the door from your phone.
 
-Built for JA Hack 2026. Live web version: **https://garagego.pages.dev**
+Live web version: **https://garagego.pages.dev**
 
 ## What it does
 
@@ -179,7 +179,7 @@ npx expo start -c     # the app: press w for web, or scan the QR code with Expo 
   without requests, so the first request after a pause takes about a minute.
 - **ESP32:** set `SERVER_URL` in the sketch to the Render address once; it doesn't change.
 - **One container instead:** the `Dockerfile` builds an image that serves the website and the API from
-  one address (it was used on the JA Hack hosting).
+  one address.
 
 ## Checks
 
