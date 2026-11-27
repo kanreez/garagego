@@ -59,6 +59,7 @@ export default function TabsLayout() {
           backgroundColor: colors.surface,
           ...shadow.float,
         },
+        tabBarLabelPosition: "below-icon",
         tabBarLabelStyle: { fontFamily: fonts.semibold, fontSize: 12, lineHeight: 16, marginTop: 2 },
         tabBarIconStyle: { height: 32 },
         sceneStyle: { backgroundColor: colors.background },
