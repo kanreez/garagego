@@ -1,4 +1,3 @@
-const crypto = require("crypto");
 const path = require("path");
 const fs = require("fs");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
@@ -216,16 +215,18 @@ app.put("/api/me/username", requireAuth, route(async (req, res) => {
 const AI_PROVIDER = (process.env.AI_PROVIDER || "anthropic").toLowerCase();
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.4-mini";
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
-const GEMINI_LITE_MODEL = process.env.GEMINI_LITE_MODEL || "gemini-flash-lite-latest";
+const GEMINI_LITE_MODEL = process.env.GEMINI_LITE_MODEL || "gemini-3.5-flash-lite";
+const GROQ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-20b";
 const GEMINI_FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL;
 const MODEL_BY_PROVIDER = {
   anthropic: process.env.ANTHROPIC_MODEL || "claude-haiku-5-5",
   "gemini-lite": GEMINI_LITE_MODEL,
   gemini: GEMINI_MODEL,
   openai: OPENAI_MODEL,
+  groq: GROQ_MODEL,
 };
-const KEY_BY_PROVIDER = { anthropic: "ANTHROPIC_API_KEY", "gemini-lite": "GEMINI_API_KEY", gemini: "GEMINI_API_KEY", openai: "OPENAI_API_KEY" };
-const AI_TIMEOUT_MS = 15000;
+const KEY_BY_PROVIDER = { anthropic: "ANTHROPIC_API_KEY", "gemini-lite": "GEMINI_API_KEY", gemini: "GEMINI_API_KEY", openai: "OPENAI_API_KEY", groq: "GROQ_API_KEY" };
+const AI_TIMEOUT_MS = 8000;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const isTemporary = (status) => status === 503 || status === 429 || status === 502;
@@ -241,35 +242,36 @@ async function withRetries(attempts, fn) {
   return result;
 }
 
-async function askOpenAI({ prompt, system, json, schema }) {
-  if (!process.env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is missing in server/.env");
-  const messages = [
-    ...(system || json
-      ? [{ role: "system", content: [system, json ? "Respond only with valid JSON." : "", schema ? `JSON shape: ${JSON.stringify(schema)}` : ""].filter(Boolean).join("\n") }]
-      : []),
-    { role: "user", content: prompt },
-  ];
-  const r = await withRetries(
-    [{ arg: OPENAI_MODEL, wait: 0 }, { arg: OPENAI_MODEL, wait: 800 }],
-    async (model) => {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
-        body: JSON.stringify({
-          model,
-          messages,
-          ...(json ? { response_format: { type: "json_object" } } : {}),
-        }),
-        signal: AbortSignal.timeout(AI_TIMEOUT_MS),
-      });
-      return { status: response.status, ok: response.ok, data: await response.json() };
-    }
-  );
-  if (!r.ok) return { status: r.status, error: r.data.error?.message || "AI request failed" };
-  const message = r.data.choices?.[0]?.message;
-  if (message?.refusal) return { refused: true };
-  return { reply: message?.content || "" };
+function chatCompletions({ url, keyName, model, retry = true }) {
+  return async ({ prompt, system, json, schema }) => {
+    if (!process.env[keyName]) throw new Error(`${keyName} is missing in server/.env`);
+    const messages = [
+      ...(system || json
+        ? [{ role: "system", content: [system, json ? "Respond only with valid JSON." : "", schema ? `JSON shape: ${JSON.stringify(schema)}` : ""].filter(Boolean).join("\n") }]
+        : []),
+      { role: "user", content: prompt },
+    ];
+    const r = await withRetries(
+      retry ? [{ arg: model, wait: 0 }, { arg: model, wait: 800 }] : [{ arg: model, wait: 0 }],
+      async (m) => {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env[keyName]}` },
+          body: JSON.stringify({ model: m, messages, ...(json ? { response_format: { type: "json_object" } } : {}) }),
+          signal: AbortSignal.timeout(AI_TIMEOUT_MS),
+        });
+        return { status: response.status, ok: response.ok, data: await response.json() };
+      }
+    );
+    if (!r.ok) return { status: r.status, error: r.data.error?.message || "AI request failed" };
+    const message = r.data.choices?.[0]?.message;
+    if (message?.refusal) return { refused: true };
+    return { reply: message?.content || "" };
+  };
 }
+
+const askOpenAI = chatCompletions({ url: "https://api.openai.com/v1/chat/completions", keyName: "OPENAI_API_KEY", model: OPENAI_MODEL });
+const askGroq = chatCompletions({ url: "https://api.groq.com/openai/v1/chat/completions", keyName: "GROQ_API_KEY", model: GROQ_MODEL, retry: false });
 
 async function askGemini({ prompt, system, json, schema, model: mainModel = GEMINI_MODEL }) {
   if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is missing in server/.env");
@@ -305,8 +307,9 @@ const PROVIDERS = {
   "gemini-lite": (opts) => askGemini({ ...opts, model: GEMINI_LITE_MODEL }),
   gemini: askGemini,
   openai: askOpenAI,
+  groq: askGroq,
 };
-const AI_CHAIN = [AI_PROVIDER, "anthropic", "gemini-lite", "gemini", "openai"]
+const AI_CHAIN = ["gemini-lite", "groq", AI_PROVIDER, "anthropic", "gemini", "openai"]
   .filter((p, i, all) => PROVIDERS[p] && all.indexOf(p) === i)
   .filter((p) => process.env[KEY_BY_PROVIDER[p]]);
 console.log(
@@ -319,7 +322,7 @@ async function askWithFallback(opts, accept) {
   const failures = [];
   for (const name of AI_CHAIN) {
     try {
-      const r = await PROVIDERS[name](opts);
+      const r = await PROVIDERS[name]({ timeoutMs: AI_TIMEOUT_MS, ...opts });
       if (r.refused) return { refused: true, provider: name };
       if (r.error) {
         failures.push(`${name}: ${r.error}`);
@@ -542,6 +545,8 @@ app.delete("/api/garages/:id", requireAuth, route(async (req, res) => {
 
 const searchCache = new Map();
 
+const NO_FILTERS = { on_topic: true, city: null, area: null, from: null, to: null, vehicle_size: null, covered: null, wants: null, terms: [] };
+
 app.post("/api/garages/search", requireAuth, route(async (req, res) => {
   const query = G.sanitizeQuery(req.body?.query);
   const nowLocal = String(req.body?.now_local ?? "");
@@ -550,16 +555,40 @@ app.post("/api/garages/search", requireAuth, route(async (req, res) => {
   if (!query) return res.status(400).json({ error: "Missing query" });
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(nowLocal)) return res.status(400).json({ error: "now_local must look like 2026-10-24T16:30" });
 
+  const [garages, bookings, ratings] = await Promise.all([repo.listGarages(), repo.listAllLiveBookings(), repo.ratingSummaries()]);
+  const visible = garages.filter((g) => !g.hidden);
+  const reply = (filters, found, extra = {}) =>
+    res.json({
+      filters,
+      from_utc: null,
+      to_utc: null,
+      center: null,
+      wants_checked: false,
+      ...extra,
+      garages: found.map((g) => ({ ...G.publicGarage(g), rating: ratings.get(g.id) ?? NO_RATING })),
+    });
+
+  const named = G.titleMatches(query, visible);
+  if (named.length) {
+    const first = named[0];
+    const center = first.latitude != null ? { latitude: first.latitude, longitude: first.longitude } : null;
+    return reply({ ...NO_FILTERS, wants: query }, named, { center, wants_checked: true });
+  }
+
   const cacheKey = `${query.toLowerCase()}|${nowLocal.slice(0, 13)}`;
   let filters = searchCache.get(cacheKey);
   if (!filters) {
     const result = await askWithFallback(
       { prompt: G.buildSearchPrompt(query, nowLocal), system: G.SEARCH_SYSTEM, json: true, schema: G.SEARCH_SCHEMA },
-      (reply) => G.cleanFilters(parseJson(reply))
+      (r) => G.cleanFilters(parseJson(r))
     );
-    if (result.error) return res.status(503).json({ error: result.error });
-    filters = result.refused ? G.cleanFilters({ on_topic: false }) : result.value;
-    searchCache.set(cacheKey, filters);
+    if (result.error) {
+      filters = { ...NO_FILTERS, city: G.cityInText(query) };
+    } else {
+      filters = result.refused ? G.cleanFilters({ on_topic: false }) : result.value;
+      if (searchCache.size > 500) searchCache.clear();
+      searchCache.set(cacheKey, filters);
+    }
   }
 
   if (!filters.on_topic) {
@@ -570,10 +599,8 @@ app.post("/api/garages/search", requireAuth, route(async (req, res) => {
   let toUtc = G.localToUtc(filters.to, tzOffset, timeZone);
   if (!fromUtc || !toUtc || new Date(toUtc) <= new Date(fromUtc)) fromUtc = toUtc = null;
 
-  const [garages, bookings, ratings] = await Promise.all([repo.listGarages(), repo.listAllLiveBookings(), repo.ratingSummaries()]);
-  const matches = garages.filter(
+  const matches = visible.filter(
     (g) =>
-      !g.hidden &&
       (!filters.city || (g.city ?? G.DEFAULT_CITY) === filters.city) &&
       G.fits(g.size, filters.vehicle_size) &&
       (filters.covered !== true || g.covered) &&
@@ -584,40 +611,21 @@ app.post("/api/garages/search", requireAuth, route(async (req, res) => {
 
   let found = matches;
   let wantsChecked = false;
-  if (filters.wants && matches.length) {
-    const ids = await matchListings(filters.wants, matches);
-    if (ids) {
-      found = ids.map((id) => matches.find((g) => g.id === id));
+  if (filters.wants) {
+    const hits = G.matchTerms([...filters.terms, filters.wants], matches);
+    if (hits) {
+      found = hits;
       wantsChecked = true;
     }
   }
 
-  res.json({
-    filters,
+  reply(filters, found, {
     from_utc: fromUtc,
     to_utc: toUtc,
     center: area ? { latitude: area.latitude, longitude: area.longitude } : null,
     wants_checked: wantsChecked,
-    garages: found.map((g) => ({ ...G.publicGarage(g), rating: ratings.get(g.id) ?? NO_RATING })),
   });
 }));
-
-const matchCache = new Map();
-async function matchListings(wants, candidates) {
-  const listed = candidates.slice(0, G.MAX_LISTINGS);
-  const prompt = G.buildMatchPrompt(wants, listed);
-  const key = crypto.createHash("sha256").update(prompt).digest("hex");
-  if (matchCache.has(key)) return matchCache.get(key);
-  const result = await askWithFallback(
-    { prompt, system: G.MATCH_SYSTEM, json: true, schema: G.MATCH_SCHEMA },
-    (reply) => G.cleanMatch(parseJson(reply), listed.map((g) => g.id))
-  );
-  if (result.error) return null;
-  const ids = result.refused ? [] : result.value;
-  if (matchCache.size > 500) matchCache.clear();
-  matchCache.set(key, ids);
-  return ids;
-}
 
 const MAX_BOOKING_DAYS = 31;
 const HOLD_MS = 10 * 60000;

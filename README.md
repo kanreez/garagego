@@ -35,7 +35,7 @@ Built for JA Hack 2026. Live web version: **https://garagego.pages.dev**
         ▼
  Express server (server/) ──► Supabase: auth, Postgres, Storage (garage photos)
         │        │
-        │        ├──► AI search: Claude Haiku → Gemini Flash-Lite → Gemini → OpenAI (first that answers)
+        │        ├──► AI search: Gemini Flash-Lite → Groq → Gemini / Claude / OpenAI (first that answers)
         │        └──► OpenStreetMap Nominatim (address search, via one rate-limited queue)
         ▲
         │  polls every 300 ms with its device key
@@ -195,6 +195,6 @@ npx expo lint
 
 - **App:** Expo SDK 58, Expo Router, React Native 0.88, react-native-maps (phone) and Leaflet (web).
 - **Server:** Express 5, Supabase (auth, Postgres, Storage).
-- **AI:** Claude Haiku 5.5 with Gemini and OpenAI as fallbacks.
+- **AI:** Gemini 3.5 Flash-Lite (free), with Groq (free), Gemini, Claude and OpenAI as fallbacks. A search by a garage's name is matched locally, without AI.
 - **Address search:** OpenStreetMap Nominatim.
 - **Door:** an ESP32 running Arduino.
