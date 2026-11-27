@@ -14,6 +14,7 @@ import { colors, spacing, typography } from "../constants/theme";
 import { useAsync } from "../hooks/useAsync";
 import { LANGS, useLanguage, useT } from "../i18n";
 import { translateError } from "../i18n/errors";
+import { latinUsername } from "../utils/latin";
 import { checkUsername, getMe, Phone, savePhone, saveUsername } from "../services/account";
 
 const CHECK_DELAY_MS = 400;
@@ -93,7 +94,7 @@ function UsernameCard({ current, onSaved }: { current: string | null; onSaved: (
       <Input
         value={value}
         onChangeText={(v) => {
-          setValue(v);
+          setValue(latinUsername(v));
           setCheck({ state: "idle" });
         }}
         placeholder="ivan.petrov"

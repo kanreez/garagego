@@ -142,7 +142,7 @@ app.post("/api/auth/login", route(async (req, res) => {
 
   let email = identifier;
   if (!identifier.includes("@")) {
-    const id = await usernames.idFor(identifier);
+    const id = await usernames.idFor(U.transliterate(identifier));
     const user = id ? (await supabase.auth.admin.getUserById(id)).data?.user : null;
     if (!user?.email) return res.status(401).json({ error: BAD_LOGIN });
     email = user.email;

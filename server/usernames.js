@@ -62,4 +62,4 @@ function createUsernames(supabase) {
   return { isAvailable, pickFree, idFor };
 }
 
-module.exports = { baseFromName, usernameProblem, createUsernames };
+module.exports = { baseFromName, usernameProblem, transliterate, createUsernames };
