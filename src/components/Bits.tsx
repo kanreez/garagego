@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ComponentProps } from "react";
 import { Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
-import { colors, doorPaints, radius, spacing, typography } from "../constants/theme";
+import { colors, doorPaints, radius, spacing, themed, typography } from "../constants/theme";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
 
@@ -13,10 +13,10 @@ type IconTileProps = {
   style?: StyleProp<ViewStyle>;
 };
 
-const ICON_ON: Record<string, string> = { [colors.accent]: colors.onAccent, [colors.cta]: colors.onCta };
+const iconOn = (bg: string) => (bg === colors.accent ? colors.onAccent : bg === colors.cta ? colors.onCta : undefined);
 
 export function IconTile({ icon, size = 44, bg = colors.sand, color, style }: IconTileProps) {
-  const fg = color ?? ICON_ON[bg] ?? colors.ink;
+  const fg = color ?? iconOn(bg) ?? colors.ink;
   return (
     <View
       style={[
@@ -109,7 +109,7 @@ export function SectionTitle({ children, muted }: { children: string; muted?: bo
   return <Text style={[styles.section, muted && { color: colors.textMuted }]}>{children}</Text>;
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   tile: { alignItems: "center", justifyContent: "center" },
   rowAction: {
     width: 44,
@@ -139,4 +139,4 @@ const styles = StyleSheet.create({
   logoLintel: { position: "absolute", top: 0, left: 0, right: 0, backgroundColor: "rgba(0, 0, 0, 0.22)" },
   logoRib: { position: "absolute", left: 0, right: 0, height: 1, backgroundColor: "rgba(0, 0, 0, 0.16)" },
   logoG: { ...typography.stencil, color: colors.white, includeFontPadding: false },
-});
+}));

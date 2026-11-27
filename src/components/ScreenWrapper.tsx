@@ -10,7 +10,7 @@ import {
   ViewStyle,
 } from "react-native";
 import { Edge, SafeAreaView } from "react-native-safe-area-context";
-import { colors, spacing } from "../constants/theme";
+import { colors, spacing, themed } from "../constants/theme";
 import { useIsWide } from "../hooks/useIsWide";
 
 type Props = {
@@ -63,7 +63,7 @@ export function ScreenWrapper({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   flex: { flex: 1 },
   scrollContent: { flexGrow: 1, paddingBottom: 120 },
@@ -71,4 +71,4 @@ const styles = StyleSheet.create({
   padded: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg },
   paddedWide: { paddingHorizontal: spacing.xxl, paddingTop: spacing.xl },
   wide: { width: "100%", maxWidth: 1160, alignSelf: "center" },
-});
+}));

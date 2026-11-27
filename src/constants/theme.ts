@@ -1,4 +1,4 @@
-export const colors = {
+const light = {
   background: "#EDEBE4",
   surface: "#F8F7F3",
   sand: "#E2DFD5",
@@ -21,7 +21,39 @@ export const colors = {
   errorText: "#9C3327",
   white: "#FFFFFF",
   plate: "#FFFFFF",
-} as const;
+  field: "#FFFFFF",
+};
+
+const dark: Palette = {
+  background: "#16181B",
+  surface: "#1F2226",
+  sand: "#2A2E33",
+  border: "#3A3F46",
+  ink: "#ECEAE4",
+  inkSoft: "#C8C5BD",
+  onInk: "#16181B",
+  textMuted: "#A0A5AC",
+  accent: "#ECEAE4",
+  accentSoft: "#2C3035",
+  accentDeep: "#ECEAE4",
+  onAccent: "#16181B",
+  cta: "#E2A23A",
+  ctaPressed: "#F0B24A",
+  onCta: "#23272B",
+  success: "#5DBB8E",
+  successSoft: "#1D3A2D",
+  error: "#E5675A",
+  errorSoft: "#3E2420",
+  errorText: "#F28B7E",
+  white: "#FFFFFF",
+  plate: "#FFFFFF",
+  field: "#1A1D21",
+};
+
+export type Palette = { [K in keyof typeof light]: string };
+export type Scheme = "light" | "dark";
+
+export const colors: Palette = { ...light };
 
 export const doorPaints = [
   "#4E8576",
@@ -38,11 +70,49 @@ export function doorPaint(id: string | null | undefined) {
   return doorPaints[h % doorPaints.length];
 }
 
-export const shadow = {
-  card: {},
-  float: { boxShadow: "0px 10px 28px rgba(35, 39, 43, 0.16)" },
-  glow: { boxShadow: "0px 6px 16px rgba(168, 112, 42, 0.28)" },
-} as const;
+const shadows = {
+  light: {
+    card: {},
+    float: { boxShadow: "0px 10px 28px rgba(35, 39, 43, 0.16)" },
+    glow: { boxShadow: "0px 6px 16px rgba(168, 112, 42, 0.28)" },
+  },
+  dark: {
+    card: {},
+    float: { boxShadow: "0px 10px 28px rgba(0, 0, 0, 0.5)" },
+    glow: { boxShadow: "0px 6px 16px rgba(226, 162, 58, 0.25)" },
+  },
+};
+
+export const shadow: { card: object; float: object; glow: object } = { ...shadows.light };
+
+let themeVersion = 0;
+export let scheme: Scheme = "light";
+
+export function applyScheme(next: Scheme) {
+  if (next === scheme) return;
+  scheme = next;
+  Object.assign(colors, next === "dark" ? dark : light);
+  Object.assign(shadow, shadows[next]);
+  themeVersion++;
+}
+
+export function themed<T extends object>(make: () => T): T {
+  let built: T | null = null;
+  let builtAt = -1;
+  const current = () => {
+    if (builtAt !== themeVersion || !built) {
+      built = make();
+      builtAt = themeVersion;
+    }
+    return built;
+  };
+  return new Proxy({} as T, {
+    get: (_t, key) => (current() as any)[key],
+    has: (_t, key) => key in current(),
+    ownKeys: () => Reflect.ownKeys(current()),
+    getOwnPropertyDescriptor: (_t, key) => Object.getOwnPropertyDescriptor(current(), key),
+  });
+}
 
 export const fonts = {
   regular: "Rubik_400Regular",

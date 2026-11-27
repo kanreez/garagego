@@ -13,7 +13,7 @@ import { ScreenWrapper } from "../../components/ScreenWrapper";
 import { EmptyState, ErrorState, Loading } from "../../components/StateViews";
 import { notify } from "../../components/Toast";
 import { SIZE_META } from "../../constants/garages";
-import { colors, doorPaint, radius, spacing, typography } from "../../constants/theme";
+import { colors, doorPaint, radius, spacing, themed, typography } from "../../constants/theme";
 import { useAsync } from "../../hooks/useAsync";
 import { useRefreshOnFocus } from "../../hooks/useRefreshOnFocus";
 import { t, useT } from "../../i18n";
@@ -351,7 +351,7 @@ function Perforation() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   page: { maxWidth: 760, width: "100%", alignSelf: "center" },
   active: { padding: spacing.lg, gap: spacing.md, borderRadius: radius.xl },
   activeHead: { flexDirection: "row", alignItems: "flex-start", gap: spacing.md },
@@ -388,4 +388,4 @@ const styles = StyleSheet.create({
   leave: { gap: spacing.sm, padding: spacing.md, borderRadius: radius.md, backgroundColor: colors.errorSoft },
   leaveActions: { flexDirection: "row", justifyContent: "flex-end", gap: spacing.sm },
   dim: { opacity: 0.7 },
-});
+}));

@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Fragment } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { colors, spacing, typography } from "../constants/theme";
+import { colors, spacing, themed, typography } from "../constants/theme";
 import { useT } from "../i18n";
 
 export function StepTracker({ active, steps: custom }: { active: number; steps?: string[] }) {
@@ -36,7 +36,7 @@ export function StepTracker({ active, steps: custom }: { active: number; steps?:
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", marginBottom: spacing.lg },
   step: { flexDirection: "row", alignItems: "center", gap: 6 },
   dot: {
@@ -53,4 +53,4 @@ const styles = StyleSheet.create({
   label: { ...typography.caption, color: colors.textMuted },
   line: { flex: 1, height: 1, marginHorizontal: 10, backgroundColor: colors.border },
   lineDone: { backgroundColor: colors.textMuted },
-});
+}));

@@ -16,9 +16,15 @@ import { PhoneGate } from "../components/PhoneGate";
 import { ToastProvider } from "../components/Toast";
 import { colors } from "../constants/theme";
 import { AuthProvider, useAuth } from "../context/AuthContext";
+import { ThemeProvider, useTheme } from "../context/ThemeContext";
 import { LanguageProvider } from "../i18n";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
+
+function ThemedStatusBar() {
+  const { scheme } = useTheme();
+  return <StatusBar style={scheme === "dark" ? "light" : "dark"} />;
+}
 
 function RootNavigator() {
   const { user, loading } = useAuth();
@@ -73,10 +79,12 @@ export default function RootLayout() {
   return (
     <LanguageProvider>
       <AuthProvider>
-        <ToastProvider>
-          <StatusBar style="dark" />
-          <RootNavigator />
-        </ToastProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <ThemedStatusBar />
+            <RootNavigator />
+          </ToastProvider>
+        </ThemeProvider>
       </AuthProvider>
     </LanguageProvider>
   );

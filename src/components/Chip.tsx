@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ComponentProps } from "react";
 import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
-import { colors, radius, spacing, typography } from "../constants/theme";
+import { colors, radius, spacing, themed, typography } from "../constants/theme";
 
 type ChipProps = {
   label: string;
@@ -57,7 +57,7 @@ export function ChipRow<T extends string>({ options, value, onChange }: ChipRowP
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   chip: {
     flexDirection: "row",
     alignItems: "center",
@@ -69,4 +69,4 @@ const styles = StyleSheet.create({
   },
   text: { ...typography.label },
   row: { gap: spacing.sm, paddingRight: spacing.lg },
-});
+}));

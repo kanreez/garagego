@@ -1,6 +1,6 @@
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
 import { SIZE_META } from "../constants/garages";
-import { colors, doorPaint, typography } from "../constants/theme";
+import { colors, doorPaint, themed, typography } from "../constants/theme";
 import { useT } from "../i18n";
 import { GarageSize } from "../types/garage";
 
@@ -31,9 +31,9 @@ export function DoorTile({ garageId, size, width = 52, height = 60, style }: Pro
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   door: { borderRadius: 3, overflow: "hidden", alignItems: "center", justifyContent: "flex-end", paddingBottom: 4 },
   lintel: { position: "absolute", top: 0, left: 0, right: 0, height: 6, backgroundColor: "rgba(0, 0, 0, 0.22)" },
   rib: { position: "absolute", left: 0, right: 0, height: 1, backgroundColor: "rgba(0, 0, 0, 0.16)" },
   stencil: { ...typography.stencil, color: colors.white, includeFontPadding: false },
-});
+}));

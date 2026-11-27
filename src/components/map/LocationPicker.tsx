@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { colors, radius, spacing, typography } from "../../constants/theme";
+import { colors, radius, spacing, themed, typography } from "../../constants/theme";
 import { useIsWide } from "../../hooks/useIsWide";
 import { useT } from "../../i18n";
 import { Coords, getCurrentLocation } from "../../utils/location";
@@ -79,7 +79,7 @@ export function LocationPicker({ value, onChange, fallbackCenter, zoom = 16, foc
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   hint: {
     position: "absolute",
     top: spacing.sm,
@@ -92,4 +92,4 @@ const styles = StyleSheet.create({
   hintText: { ...typography.label, fontSize: 13, color: colors.ink },
   row: { flexDirection: "row", alignItems: "center", gap: spacing.sm, flexWrap: "wrap" },
   caption: { ...typography.caption, color: colors.textMuted },
-});
+}));

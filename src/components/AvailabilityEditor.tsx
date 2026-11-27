@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ComponentProps, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { colors, spacing, typography } from "../constants/theme";
+import { colors, spacing, themed, typography } from "../constants/theme";
 import { AvailabilityWindow } from "../types/garage";
 import { useT } from "../i18n";
 import { dayShort, formatHour, WEEK } from "../utils/availability";
@@ -108,7 +108,7 @@ function StepButton({ icon, label, onPress, disabled }: { icon: IconName; label:
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   days: { gap: 6 },
   day: { flexDirection: "row", alignItems: "center", gap: spacing.sm, minHeight: 44 },
   dayChip: { width: 72 },
@@ -120,4 +120,4 @@ const styles = StyleSheet.create({
   off: { ...typography.caption, color: colors.textMuted },
   error: { ...typography.caption, color: colors.errorText },
   caption: { ...typography.caption, color: colors.textMuted },
-});
+}));

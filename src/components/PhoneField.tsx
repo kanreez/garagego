@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { colors, radius, spacing, typography } from "../constants/theme";
+import { colors, radius, spacing, themed, typography } from "../constants/theme";
 import { useT } from "../i18n";
 import { Input } from "./Input";
 
@@ -57,7 +57,7 @@ function Choice({ selected, onPress, icon, title, text }: { selected: boolean; o
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   wrap: { gap: spacing.sm },
   choices: { gap: spacing.xs },
   choice: {
@@ -69,10 +69,10 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: colors.border,
     borderRadius: radius.md,
-    backgroundColor: colors.white,
+    backgroundColor: colors.field,
   },
   choiceOn: { borderColor: colors.ink },
   choiceTitle: { ...typography.label, color: colors.ink },
   choiceText: { ...typography.caption, color: colors.textMuted },
   note: { ...typography.caption, color: colors.textMuted },
-});
+}));

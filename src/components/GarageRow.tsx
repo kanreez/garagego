@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { placeLabel, SIZE_META } from "../constants/garages";
-import { colors, typography } from "../constants/theme";
+import { colors, themed, typography } from "../constants/theme";
 import { t, useT } from "../i18n";
 import { Garage } from "../types/garage";
 import { formatMoney } from "../utils/booking";
@@ -66,7 +66,7 @@ export function GarageRow({ garage: g, distanceKm, onPress }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -83,4 +83,4 @@ const styles = StyleSheet.create({
   prices: { alignItems: "flex-end" },
   price: { ...typography.figureSm, color: colors.ink },
   tabular: typography.tabular,
-});
+}));

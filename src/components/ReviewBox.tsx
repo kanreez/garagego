@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { colors, spacing, typography } from "../constants/theme";
+import { colors, spacing, themed, typography } from "../constants/theme";
 import { useT } from "../i18n";
 import { saveReview } from "../services/garages";
 import { Booking } from "../types/garage";
@@ -84,7 +84,7 @@ export function ReviewBox({ booking, onSaved }: { booking: Booking; onSaved?: ()
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   start: { alignSelf: "flex-start" },
   mine: { flexDirection: "row", alignItems: "flex-start", gap: spacing.sm, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.border },
   mineHead: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
@@ -93,4 +93,4 @@ const styles = StyleSheet.create({
   form: { gap: spacing.sm, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.border },
   actions: { flexDirection: "row", justifyContent: "flex-end", gap: spacing.sm },
   hint: { ...typography.caption, color: colors.textMuted, textAlign: "right" },
-});
+}));

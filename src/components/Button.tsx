@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ComponentProps } from "react";
 import { ActivityIndicator, Pressable, PressableProps, StyleSheet, Text } from "react-native";
-import { colors, radius, shadow, spacing, typography } from "../constants/theme";
+import { colors, radius, shadow, spacing, themed, typography } from "../constants/theme";
 
 type Variant = "primary" | "accent" | "secondary" | "ghost" | "danger";
 
@@ -13,13 +13,13 @@ type Props = Omit<PressableProps, "children"> & {
   size?: "md" | "sm";
 };
 
-const palette: Record<Variant, { bg: string; fg: string; pressed: string }> = {
+const palette = themed<Record<Variant, { bg: string; fg: string; pressed: string }>>(() => ({
   primary: { bg: colors.ink, fg: colors.onInk, pressed: colors.inkSoft },
   accent: { bg: colors.cta, fg: colors.onCta, pressed: colors.ctaPressed },
   secondary: { bg: colors.sand, fg: colors.ink, pressed: colors.border },
   ghost: { bg: "transparent", fg: colors.ink, pressed: colors.sand },
   danger: { bg: colors.errorSoft, fg: colors.errorText, pressed: colors.errorSoft },
-};
+}));
 
 export function Button({
   title,
@@ -62,7 +62,7 @@ export function Button({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   base: {
     minHeight: 56,
     paddingHorizontal: spacing.lg,
@@ -78,4 +78,4 @@ const styles = StyleSheet.create({
   disabledQuiet: { opacity: 0.7 },
   text: { ...typography.label, fontSize: 16 },
   textSm: { fontSize: 14 },
-});
+}));

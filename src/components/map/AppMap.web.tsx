@@ -3,7 +3,7 @@ import "leaflet/dist/leaflet.css";
 import { useEffect, useMemo } from "react";
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { StyleSheet, View } from "react-native";
-import { colors, doorPaint, fonts, radius } from "../../constants/theme";
+import { colors, doorPaint, fonts, radius, themed } from "../../constants/theme";
 import { Coords } from "../../utils/location";
 import { AppMapProps, DEFAULT_ZOOM, MapPin } from "./types";
 
@@ -117,6 +117,6 @@ function PickedPin({ coords, paint, onPick }: { coords: Coords; paint: string; o
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   wrap: { overflow: "hidden", borderRadius: radius.lg, backgroundColor: colors.sand, zIndex: 0 },
-});
+}));

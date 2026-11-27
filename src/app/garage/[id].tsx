@@ -18,7 +18,7 @@ import { ErrorState, Loading } from "../../components/StateViews";
 import { StepTracker } from "../../components/StepTracker";
 import { notify } from "../../components/Toast";
 import { placeLabel, SIZE_META } from "../../constants/garages";
-import { colors, radius, shadow, spacing, typography, doorPaint } from "../../constants/theme";
+import { colors, doorPaint, radius, shadow, spacing, themed, typography } from "../../constants/theme";
 import { useAsync } from "../../hooks/useAsync";
 import { useIsWide } from "../../hooks/useIsWide";
 import { useT } from "../../i18n";
@@ -413,7 +413,7 @@ function StepButton({ icon, label, onPress, disabled }: { icon: IconName; label:
 
 const stickyOnWeb = (Platform.OS === "web" ? { position: "sticky", top: spacing.lg } : null) as ViewStyle | null;
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   columns: { flexDirection: "row", alignItems: "flex-start", gap: spacing.xl },
   map: { height: 200, marginTop: spacing.md },
   detailsColumn: { flex: 1, minWidth: 0 },
@@ -490,4 +490,4 @@ const styles = StyleSheet.create({
   clashText: { ...typography.label, color: colors.errorText, flex: 1 },
   description: { ...typography.body, color: colors.ink, marginTop: spacing.md },
   note: { ...typography.caption, color: colors.textMuted, textAlign: "center", marginTop: spacing.sm },
-});
+}));

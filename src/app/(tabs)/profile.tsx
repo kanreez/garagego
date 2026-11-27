@@ -11,7 +11,7 @@ import { Input } from "../../components/Input";
 import { ScreenWrapper } from "../../components/ScreenWrapper";
 import { Loading } from "../../components/StateViews";
 import { notify } from "../../components/Toast";
-import { colors, radius, spacing, typography } from "../../constants/theme";
+import { colors, radius, spacing, themed, typography } from "../../constants/theme";
 import { useAuth } from "../../context/AuthContext";
 import { useAsync } from "../../hooks/useAsync";
 import { useT } from "../../i18n";
@@ -133,7 +133,7 @@ function SettingRow({ icon, label, hint, onPress, divider }: SettingRowProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   page: { maxWidth: 640, width: "100%", alignSelf: "center" },
   hero: {
     flexDirection: "row",
@@ -158,4 +158,4 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderRadius: radius.md,
   },
-});
+}));

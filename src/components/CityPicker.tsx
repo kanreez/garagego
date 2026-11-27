@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { BIG_CITIES, CITIES, City, cityLabel } from "../constants/garages";
-import { colors, radius, shadow, spacing, typography } from "../constants/theme";
+import { colors, radius, shadow, spacing, themed, typography } from "../constants/theme";
 import { useIsWide } from "../hooks/useIsWide";
 import { getLang, useT } from "../i18n";
 import { Input } from "./Input";
@@ -91,7 +91,7 @@ export function CityPicker({ label, value, onChange }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   label: { ...typography.label, color: colors.ink },
   field: {
     minHeight: 54,
@@ -132,4 +132,4 @@ const styles = StyleSheet.create({
   rowOn: { backgroundColor: colors.accentSoft },
   rowText: { ...typography.body, color: colors.ink },
   empty: { ...typography.body, color: colors.textMuted, padding: spacing.md },
-});
+}));

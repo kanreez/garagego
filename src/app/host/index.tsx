@@ -9,7 +9,7 @@ import { Header } from "../../components/Header";
 import { ScreenWrapper } from "../../components/ScreenWrapper";
 import { EmptyState, ErrorState, Loading } from "../../components/StateViews";
 import { notify } from "../../components/Toast";
-import { colors, radius, spacing, typography } from "../../constants/theme";
+import { colors, radius, spacing, themed, typography } from "../../constants/theme";
 import { useAsync } from "../../hooks/useAsync";
 import { useRefreshOnFocus } from "../../hooks/useRefreshOnFocus";
 import { t, tn, useT } from "../../i18n";
@@ -182,7 +182,7 @@ function PairDevice({ garage, now }: { garage: Garage; now: number }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   page: { maxWidth: 760, width: "100%", alignSelf: "center" },
   earnings: { flexDirection: "row", alignItems: "center", gap: spacing.md, marginBottom: spacing.md },
   earningsValue: { ...typography.h1, color: colors.ink },
@@ -198,4 +198,4 @@ const styles = StyleSheet.create({
   free: { ...typography.caption, color: colors.textMuted, marginTop: -spacing.xs, marginBottom: spacing.sm, paddingHorizontal: spacing.sm },
   keyBox: { padding: 12, borderRadius: radius.md, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   key: { ...typography.label, color: colors.ink, letterSpacing: 0.5 },
-});
+}));

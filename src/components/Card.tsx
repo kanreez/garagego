@@ -1,5 +1,5 @@
 import { Pressable, StyleProp, StyleSheet, View, ViewProps, ViewStyle } from "react-native";
-import { colors, radius, shadow, spacing } from "../constants/theme";
+import { colors, radius, shadow, spacing, themed } from "../constants/theme";
 
 type Props = ViewProps & {
   onPress?: () => void;
@@ -26,7 +26,7 @@ export function Card({ style, children, onPress, ...rest }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   card: {
     padding: spacing.md,
     borderRadius: radius.lg,
@@ -34,4 +34,4 @@ const styles = StyleSheet.create({
     ...shadow.card,
   },
   pressed: { opacity: 0.85 },
-});
+}));

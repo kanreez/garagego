@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ComponentProps } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { colors, spacing, typography } from "../constants/theme";
+import { colors, spacing, themed, typography } from "../constants/theme";
 import { useT } from "../i18n";
 import { Button } from "./Button";
 
@@ -53,7 +53,7 @@ export function ErrorState({ message, onRetry }: ErrorProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   box: {
     flex: 1,
     alignItems: "flex-start",
@@ -72,4 +72,4 @@ const styles = StyleSheet.create({
   },
   title: { ...typography.h2, color: colors.ink },
   body: { ...typography.body, color: colors.textMuted, marginBottom: spacing.sm, maxWidth: 420 },
-});
+}));

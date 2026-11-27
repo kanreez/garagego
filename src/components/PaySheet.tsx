@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
 import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { colors, radius, shadow, spacing, typography } from "../constants/theme";
+import { colors, radius, shadow, spacing, themed, typography } from "../constants/theme";
 import { useIsWide } from "../hooks/useIsWide";
 import { t, useT } from "../i18n";
 import { translateError } from "../i18n/errors";
@@ -244,7 +244,7 @@ export function PaySheet({ checkout, title, range, breakdown, onPaid, onClose, o
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   backdrop: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(35, 39, 43, 0.45)" },
   backdropWide: { justifyContent: "center", alignItems: "center", padding: spacing.lg },
   sheet: {
@@ -293,4 +293,4 @@ const styles = StyleSheet.create({
   bank: { gap: spacing.sm, padding: spacing.md, borderRadius: radius.lg, backgroundColor: colors.sand },
   bankHead: { flexDirection: "row", alignItems: "center", gap: spacing.md, marginBottom: spacing.sm },
   bankTitle: { ...typography.h3, color: colors.ink },
-});
+}));

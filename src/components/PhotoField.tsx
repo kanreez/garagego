@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useState } from "react";
 import { ActivityIndicator, Platform, StyleSheet, Text, View } from "react-native";
-import { colors, radius, spacing, typography } from "../constants/theme";
+import { colors, radius, spacing, themed, typography } from "../constants/theme";
 import { useT } from "../i18n";
 import { uploadGaragePhoto } from "../services/garages";
 import { pickGaragePhoto } from "../utils/photo";
@@ -75,7 +75,7 @@ export function PhotoField({ value, onChange, onBusy }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   label: { ...typography.label, color: colors.ink },
   frame: { width: "100%", aspectRatio: 4 / 3, borderRadius: radius.lg, overflow: "hidden", backgroundColor: colors.sand },
   empty: {
@@ -91,4 +91,4 @@ const styles = StyleSheet.create({
   veil: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, alignItems: "center", justifyContent: "center", gap: spacing.sm, backgroundColor: "rgba(35, 39, 43, 0.6)" },
   veilText: { ...typography.label, color: colors.ink },
   row: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
-});
+}));

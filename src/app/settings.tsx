@@ -10,10 +10,11 @@ import { PhoneField } from "../components/PhoneField";
 import { ScreenWrapper } from "../components/ScreenWrapper";
 import { ErrorState, Loading } from "../components/StateViews";
 import { notify } from "../components/Toast";
-import { colors, spacing, typography } from "../constants/theme";
+import { colors, spacing, themed, typography } from "../constants/theme";
 import { useAsync } from "../hooks/useAsync";
 import { LANGS, useLanguage, useT } from "../i18n";
 import { translateError } from "../i18n/errors";
+import { ThemePref, useTheme } from "../context/ThemeContext";
 import { checkUsername, getMe, Phone, savePhone, saveUsername } from "../services/account";
 
 const CHECK_DELAY_MS = 400;
@@ -39,6 +40,7 @@ export default function Settings() {
         </>
       )}
       <LanguageCard />
+      <ThemeCard />
     </ScreenWrapper>
   );
 }
@@ -159,6 +161,41 @@ function PhoneCard({ current, onSaved }: { current: Phone | null; onSaved: (p: P
   );
 }
 
+function ThemeCard() {
+  const { t } = useT();
+  const { pref, setPref } = useTheme();
+  const options: { value: ThemePref; label: string; icon: "phone-portrait-outline" | "sunny-outline" | "moon-outline" }[] = [
+    { value: "system", label: t("settings.themeSystem"), icon: "phone-portrait-outline" },
+    { value: "light", label: t("settings.themeLight"), icon: "sunny-outline" },
+    { value: "dark", label: t("settings.themeDark"), icon: "moon-outline" },
+  ];
+  return (
+    <Card style={styles.group}>
+      <Text style={styles.groupTitle}>{t("settings.theme")}</Text>
+      <View accessibilityRole="radiogroup">
+        {options.map((o, i) => {
+          const selected = o.value === pref;
+          return (
+            <Pressable
+              key={o.value}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: selected }}
+              onPress={() => setPref(o.value)}
+              style={({ pressed }) => [styles.langRow, i > 0 && styles.divider, pressed && { opacity: 0.7 }]}
+            >
+              <View style={styles.themeLabel}>
+                <Ionicons name={o.icon} size={20} color={colors.ink} />
+                <Text style={styles.langLabel}>{o.label}</Text>
+              </View>
+              <Ionicons name={selected ? "radio-button-on" : "radio-button-off"} size={22} color={selected ? colors.accentDeep : colors.textMuted} />
+            </Pressable>
+          );
+        })}
+      </View>
+    </Card>
+  );
+}
+
 function LanguageCard() {
   const { t } = useT();
   const { lang, setLang } = useLanguage();
@@ -186,7 +223,7 @@ function LanguageCard() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   page: { maxWidth: 640, width: "100%", alignSelf: "center" },
   group: { gap: spacing.sm, padding: spacing.lg, marginBottom: spacing.md },
   groupTitle: { ...typography.h3, color: colors.ink },
@@ -195,4 +232,5 @@ const styles = StyleSheet.create({
   langRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", minHeight: 52 },
   divider: { borderTopWidth: 1, borderTopColor: colors.border },
   langLabel: { ...typography.h3, color: colors.ink },
-});
+  themeLabel: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+}));

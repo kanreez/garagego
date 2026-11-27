@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Href } from "expo-router";
 import { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { colors, shadow, spacing, typography } from "../constants/theme";
+import { colors, shadow, spacing, themed, typography } from "../constants/theme";
 import { t, useT } from "../i18n";
 import { goBack } from "../utils/navigation";
 
@@ -59,7 +59,7 @@ export function IconButton({ icon, label, onPress, tone = "plain" }: IconButtonP
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -78,4 +78,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-});
+}));

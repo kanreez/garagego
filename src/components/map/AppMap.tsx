@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-import { colors, doorPaint, radius, typography } from "../../constants/theme";
+import { colors, doorPaint, radius, themed, typography } from "../../constants/theme";
 import { AppMapProps, DEFAULT_ZOOM } from "./types";
 
 export function AppMap({ center, zoom = DEFAULT_ZOOM, recenterKey, pins = [], selectedId, onSelectPin, picked, pickedPaint, onPick, fitToPins, interactive = true, style }: AppMapProps) {
@@ -72,7 +72,7 @@ export function AppMap({ center, zoom = DEFAULT_ZOOM, recenterKey, pins = [], se
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   wrap: { overflow: "hidden", borderRadius: radius.lg, backgroundColor: colors.sand },
   pill: {
     flexDirection: "row",
@@ -88,4 +88,4 @@ const styles = StyleSheet.create({
   },
   swatch: { width: 12, height: 14, borderRadius: 2 },
   pillText: { ...typography.label, fontSize: 13, color: colors.onInk },
-});
+}));

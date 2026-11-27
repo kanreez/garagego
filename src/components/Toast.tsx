@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { Animated, StyleSheet, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors, radius, shadow, spacing, typography } from "../constants/theme";
+import { colors, radius, shadow, spacing, themed, typography } from "../constants/theme";
 
 type ToastType = "success" | "error" | "info";
 type ToastState = { message: string; type: ToastType; key: number } | null;
@@ -77,7 +77,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   toast: {
     position: "absolute",
     left: spacing.md,
@@ -97,4 +97,4 @@ const styles = StyleSheet.create({
     ...shadow.float,
   },
   text: { ...typography.label, color: colors.ink, flex: 1 },
-});
+}));

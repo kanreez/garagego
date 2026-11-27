@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, TextInputProps, View } from "react-native";
-import { colors, radius, spacing, typography } from "../constants/theme";
+import { colors, radius, spacing, themed, typography } from "../constants/theme";
 
 type Props = TextInputProps & {
   label?: string;
@@ -43,7 +43,7 @@ export function Input({ label, error, hint, style, multiline, onFocus, onBlur, .
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   container: { gap: 6 },
   label: { ...typography.label, color: colors.ink },
   input: {
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: colors.border,
     borderRadius: radius.md,
-    backgroundColor: colors.white,
+    backgroundColor: colors.field,
     color: colors.ink,
   },
   multiline: { minHeight: 110, textAlignVertical: "top" },
@@ -62,4 +62,4 @@ const styles = StyleSheet.create({
   inputError: { borderColor: colors.error },
   error: { ...typography.caption, color: colors.errorText },
   hint: { ...typography.caption, color: colors.textMuted },
-});
+}));

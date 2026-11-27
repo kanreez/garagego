@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import { APP_NAME } from "../constants/app";
-import { colors, fonts, typography } from "../constants/theme";
+import { colors, fonts, themed, typography } from "../constants/theme";
 import { LogoTile } from "./Bits";
 
 export function BrandMark({ size = 40 }: { size?: number }) {
@@ -12,7 +12,7 @@ export function BrandMark({ size = 40 }: { size?: number }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 10 },
   name: { ...typography.h3, fontFamily: fonts.bold, color: colors.ink },
-});
+}));

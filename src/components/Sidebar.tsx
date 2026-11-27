@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import type { BottomTabBarProps } from "expo-router/tabs";
 import { ComponentProps } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { colors, radius, spacing, typography } from "../constants/theme";
+import { colors, radius, spacing, themed, typography } from "../constants/theme";
 import { useT } from "../i18n";
 import { BrandMark } from "./BrandMark";
 import { Button } from "./Button";
@@ -61,7 +61,7 @@ export function Sidebar({ state, descriptors, emitter, navigateToTab }: BottomTa
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   bar: {
     width: 248,
     paddingHorizontal: spacing.md,
@@ -87,4 +87,4 @@ const styles = StyleSheet.create({
   host: { gap: spacing.sm, padding: spacing.md, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   hostTitle: { ...typography.h3, color: colors.ink },
   hostBody: { ...typography.caption, color: colors.textMuted, marginBottom: spacing.xs },
-});
+}));

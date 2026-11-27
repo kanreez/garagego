@@ -15,7 +15,7 @@ import { ErrorState, Loading } from "../../components/StateViews";
 import { PhotoField } from "../../components/PhotoField";
 import { notify } from "../../components/Toast";
 import { ACCESS_META, AREA_CENTERS, areaLabel, AREAS, cityByName, cityCenter, cityLabel, DEFAULT_CITY, SIZE_META } from "../../constants/garages";
-import { colors, radius, spacing, typography } from "../../constants/theme";
+import { colors, radius, spacing, themed, typography } from "../../constants/theme";
 import { useAsync } from "../../hooks/useAsync";
 import { t, useT } from "../../i18n";
 import { createGarage, getGarage, updateGarage } from "../../services/garages";
@@ -378,7 +378,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   page: { maxWidth: 640, width: "100%", alignSelf: "center" },
   group: { gap: spacing.md, padding: spacing.lg, marginBottom: spacing.md },
   groupTitle: { ...typography.h3, color: colors.ink },
@@ -391,4 +391,4 @@ const styles = StyleSheet.create({
   result: { minHeight: 44, flexDirection: "row", alignItems: "center", gap: spacing.sm, paddingHorizontal: spacing.sm },
   row: { flexDirection: "row", alignItems: "center", gap: spacing.sm, flexWrap: "wrap" },
   prices: { flexDirection: "row", gap: spacing.sm },
-});
+}));

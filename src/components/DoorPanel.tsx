@@ -1,7 +1,7 @@
 import * as Haptics from "expo-haptics";
 import { useEffect, useRef, useState } from "react";
 import { AccessibilityInfo, Animated, Easing, Platform, StyleSheet, Text, View } from "react-native";
-import { colors, doorPaints, radius, spacing, typography } from "../constants/theme";
+import { colors, doorPaints, radius, spacing, themed, typography } from "../constants/theme";
 
 export type DoorVisual = "closed" | "opening" | "open" | "closing" | "error";
 
@@ -130,7 +130,7 @@ const SLAT_GAP = 2;
 const BAY = "#2B2F33";
 const SLAT_HEIGHT = (DOOR_HEIGHT - SLAT_GAP * (SLATS - 1)) / SLATS;
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   wrap: { gap: spacing.sm },
   frame: {
     height: DOOR_HEIGHT + 10,
@@ -152,4 +152,4 @@ const styles = StyleSheet.create({
   stencil: { ...typography.stencil, position: "absolute", top: 40, alignSelf: "center", fontSize: 64, lineHeight: 76, color: colors.white, includeFontPadding: false },
   handle: { position: "absolute", bottom: 8, alignSelf: "center", width: 44, height: 4, borderRadius: 2, backgroundColor: "rgba(0, 0, 0, 0.3)" },
   caption: { ...typography.h3, color: colors.ink, ...typography.tabular },
-});
+}));

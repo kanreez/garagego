@@ -17,7 +17,7 @@ import { EmptyState, ErrorState, Loading } from "../../components/StateViews";
 import { StepTracker } from "../../components/StepTracker";
 import { notify } from "../../components/Toast";
 import { AREA_CENTERS, areaLabel, cityLabel, exampleQueries, SIZE_META } from "../../constants/garages";
-import { colors, radius, spacing, typography } from "../../constants/theme";
+import { colors, radius, spacing, themed, typography } from "../../constants/theme";
 import { useAsync } from "../../hooks/useAsync";
 import { useIsWide } from "../../hooks/useIsWide";
 import { useT } from "../../i18n";
@@ -276,7 +276,7 @@ function Understood({ result, onClear }: { result: SearchResult; onClear: () => 
 
 const EU_PLATE_BLUE = "#1F3FA6";
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   eyebrowMuted: { ...typography.eyebrow, color: colors.textMuted },
   topRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: spacing.md },
   ask: { gap: 12, padding: spacing.md, marginTop: spacing.md, borderRadius: radius.xl },
@@ -317,4 +317,4 @@ const styles = StyleSheet.create({
   columns: { flexDirection: "row", alignItems: "flex-start", gap: spacing.xl },
   askColumn: { width: 420 },
   resultsColumn: { flex: 1, minWidth: 0, marginTop: -spacing.xl },
-});
+}));

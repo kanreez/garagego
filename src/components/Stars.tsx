@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { colors, typography } from "../constants/theme";
+import { colors, themed, typography } from "../constants/theme";
 import { useT } from "../i18n";
 import { RatingSummary } from "../types/garage";
 
@@ -59,11 +59,11 @@ export function StarPicker({ value, onChange }: { value: number; onChange: (v: n
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   row: { flexDirection: "row", gap: 2 },
   line: { flexDirection: "row", alignItems: "center", gap: 4 },
   average: { ...typography.label, color: colors.ink, ...typography.tabular },
   muted: { ...typography.caption, color: colors.textMuted },
   picker: { flexDirection: "row", gap: 4 },
   pick: { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
-});
+}));

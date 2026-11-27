@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { StyleSheet, Text, View } from "react-native";
-import { colors, fonts } from "../constants/theme";
+import { colors, fonts, themed } from "../constants/theme";
 
 type Props = {
   uri?: string | null;
@@ -29,8 +29,8 @@ export function Avatar({ uri, name, size = 44 }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   base: { backgroundColor: colors.sand, overflow: "hidden" },
   fallback: { alignItems: "center", justifyContent: "center", backgroundColor: colors.accent },
   initials: { fontFamily: fonts.bold, color: colors.onAccent },
-});
+}));

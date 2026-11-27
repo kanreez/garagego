@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Linking, Pressable, StyleSheet, Text } from "react-native";
-import { colors, spacing, typography } from "../constants/theme";
+import { colors, spacing, themed, typography } from "../constants/theme";
 import { useT } from "../i18n";
 
 export function formatPhone(n: string) {
@@ -24,7 +24,7 @@ export function CallHost({ number }: { number: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: spacing.xs, alignSelf: "flex-start" },
   number: { ...typography.label, color: colors.accentDeep, textDecorationLine: "underline" },
-});
+}));
