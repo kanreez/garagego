@@ -15,6 +15,7 @@ import { colors, radius, spacing, typography } from "../../constants/theme";
 import { useAuth } from "../../context/AuthContext";
 import { useAsync } from "../../hooks/useAsync";
 import { useT } from "../../i18n";
+import { getMe } from "../../services/account";
 import { supabase } from "../../services/supabase";
 import { getProfile, ProfileUpdate, updateProfile } from "../../services/userService";
 
@@ -25,6 +26,9 @@ export default function Profile() {
     () => (user ? getProfile(user.id) : Promise.resolve(null)),
     [user?.id]
   );
+
+  const me = useAsync(() => (user ? getMe() : Promise.resolve(null)), [user?.id]);
+  const isAdmin = !!me.data?.is_admin;
 
   const [draftName, setFullName] = useState<string | null>(null);
   const fullName = draftName ?? profile?.full_name ?? user?.user_metadata?.full_name ?? "";
@@ -82,6 +86,9 @@ export default function Profile() {
         <SettingRow icon="settings" label={t("profile.settings")} hint={t("profile.settingsHint")} onPress={() => router.push("/settings")} />
         <SettingRow icon="home" label={t("profile.garages")} hint={t("profile.garagesHint")} onPress={() => router.push("/host")} divider />
         <SettingRow icon="key" label={t("profile.bookings")} onPress={() => router.navigate("/bookings")} divider />
+        {isAdmin ? (
+          <SettingRow icon="shield-checkmark" label={t("profile.admin")} hint={t("profile.adminHint")} onPress={() => router.push("/admin")} divider />
+        ) : null}
       </Card>
 
       {loading ? (

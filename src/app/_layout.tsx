@@ -49,6 +49,7 @@ function RootNavigator() {
         <Stack.Screen name="host/index" />
         <Stack.Screen name="host/new" />
         <Stack.Screen name="settings" />
+        <Stack.Screen name="admin" />
       </Stack>
     </PhoneGate>
   );

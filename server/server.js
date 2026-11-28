@@ -9,6 +9,7 @@ const G = require("./garages");
 const { createRepo } = require("./repo");
 const U = require("./usernames");
 const P = require("./phones");
+const A = require("./admin");
 const geo = require("./geocode");
 const photos = require("./photos");
 const { createPaymentProvider, PaymentError } = require("./payments/provider");
@@ -56,6 +57,7 @@ async function requireAuth(req, res, next) {
 
   const { data, error } = await supabase.auth.getUser(token);
   if (error || !data.user) return res.status(401).json({ error: "Invalid token" });
+  if (A.isBlocked(data.user)) return res.status(403).json({ error: "This account is blocked" });
 
   req.user = data.user;
   next();
@@ -88,7 +90,7 @@ app.get("/api/me", requireAuth, async (req, res) => {
     .maybeSingle();
 
   if (error) return res.status(500).json({ error: error.message });
-  res.json({ user: { id: req.user.id, email: req.user.email }, profile: data, phone: P.phoneOf(req.user) });
+  res.json({ user: { id: req.user.id, email: req.user.email }, profile: data, phone: P.phoneOf(req.user), is_admin: A.isAdmin(req.user) });
 });
 
 app.put("/api/me/phone", requireAuth, route(async (req, res) => {
@@ -936,6 +938,8 @@ app.post(PHOTO_PATH, requireAuth, photoBody, route(async (req, res) => {
   const url = await photoStore.save({ buffer, type, userId: req.user.id, baseUrl: `${req.protocol}://${req.get("host")}` });
   res.status(201).json({ url });
 }));
+
+A.registerAdmin(app, { supabase, repo, requireAuth, route, deviceLastSeen });
 
 const WEB_DIR = path.join(__dirname, "..", "dist");
 if (fs.existsSync(path.join(WEB_DIR, "index.html"))) {

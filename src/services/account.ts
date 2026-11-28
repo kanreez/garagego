@@ -6,6 +6,7 @@ export type Me = {
   user: { id: string; email: string };
   profile: { username: string | null; full_name: string | null } | null;
   phone: Phone | null;
+  is_admin?: boolean;
 };
 
 export const getMe = () => api.get<Me>("/api/me");

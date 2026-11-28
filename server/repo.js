@@ -383,6 +383,29 @@ function createRepo(supabase) {
     return updateCommand(next.id, { delivered_at: new Date().toISOString() });
   }
 
+  async function listAllBookings() {
+    await expireStaleBookings();
+    if (await hasTable("bookings")) return must(await supabase.from("bookings").select("*"));
+    return [...mem.bookings];
+  }
+
+  async function listAllPayments() {
+    if (await hasTable("payments")) return must(await supabase.from("payments").select("*"));
+    return [...mem.payments];
+  }
+
+  async function listAllReviews() {
+    if (await hasTable("reviews")) return must(await supabase.from("reviews").select("*").order("created_at", { ascending: false }));
+    return [...mem.reviews].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  }
+
+  async function deleteReview(id) {
+    if (await hasTable("reviews")) return must(await supabase.from("reviews").delete().eq("id", id).select("id")).length > 0;
+    const i = mem.reviews.findIndex((r) => r.id === id);
+    if (i >= 0) mem.reviews.splice(i, 1);
+    return i >= 0;
+  }
+
   return {
     SEED_KEYS,
     listGarages,
@@ -414,6 +437,10 @@ function createRepo(supabase) {
     getCommand,
     updateCommand,
     takeNextCommand,
+    listAllBookings,
+    listAllPayments,
+    listAllReviews,
+    deleteReview,
   };
 }
 
